@@ -1,7 +1,7 @@
 import requests
 import json
 from bs4 import BeautifulSoup
-
+import os
 from flask import Flask, request, jsonify, send_from_directory, render_template
 app = Flask(__name__, static_url_path='')
 app.Debug = True
