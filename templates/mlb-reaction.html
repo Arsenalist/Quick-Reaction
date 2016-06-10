@@ -1,0 +1,19 @@
+<div class="container-fluid">
+<h3>Hitters</h3>
+{% if hitters %}
+  {% for h in hitters %}
+    {{h|safe}}
+  {% endfor %}
+{% endif %}
+{% if pitchers %}
+  <h3>Pitchers</h3>
+  {% for p in pitchers %}
+    {{p|safe}}
+  {% endfor %}
+{% endif %}
+{% if managerHtml %}
+  <h3>Manager</h3>
+  {{managerHtml|safe}}
+{% endif %}  
+</div>
+  
