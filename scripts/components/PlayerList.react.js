@@ -3,6 +3,8 @@ var Pitcher = require('./Pitcher.react.js');
 var BattingSummary = require('./BattingSummary.react.js');
 var BullpenSummary = require('./BullpenSummary.react.js');
 var Manager = require('./Manager.react.js');
+var FreeForm = require('./FreeForm.react.js');
+
 var React = require('react');
 var _ = require('lodash');
 
@@ -33,6 +35,13 @@ var PlayerList = React.createClass({
       });
     }
 
+    var freeForm = [];
+    for (var i = 0; i<5; i++) {
+      freeForm.push(<FreeForm handleTextChange={this.props.handleTextChange} index={i}/>);
+    }
+
+    
+
     return (
       <div className="blurbs">
       <h3>Starting Pitcher</h3>
@@ -51,6 +60,10 @@ var PlayerList = React.createClass({
       <div className="playerList well">
           <Manager handleTextChange={this.props.handleTextChange} handleGradeChange={this.props.handleGradeChange}  data={this.props.manager}/>
       </div>
+      <h3>Extra Innings</h3>
+      <div className="playerList well">
+          {{freeForm}}
+      </div>      
       <h3>Notable Pitchers</h3>
       <div className="playerList well">
           {bullpenPitchersElements}

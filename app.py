@@ -164,7 +164,11 @@ def generate_reaction():
   for key, value in data.iteritems() :
       print key
 
-
+  battingSummaryHtml = None
+  bullpenSummaryHtml = None
+  managerHtml = None
+  startingPitcherHtml = None
+  
   if 'battingSummaryBlurb' in data['extra']:
 
       totals = [0] * len(data['player_records'])
@@ -236,9 +240,13 @@ def generate_reaction():
       personName=manager['name'], personImage=manager['image'])
 
 
-  print pitchers
+  freeForm = []
+  for x in range(0, 5):
+    if 'freeForm' + str(x) in data['extra']:
+      freeForm.append(data['extra']['freeForm' + str(x)])
+
   html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml,
-   battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml)
+   battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml, freeForm=freeForm)
 
   return jsonify({"html": html});
 
