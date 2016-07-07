@@ -98,7 +98,6 @@ class MLB:
     r = requests.get("https://api.thescore.com/mlb/teams/" + str(team_id) + "/events/full_schedule?rpp=-1")
     games = r.json()
     latest_game_index = max(self.find_latest_game_index_by_status(games, 'in_progress'), self.find_latest_game_index_by_status(games, 'final'))
-    print latest_game_index
     latest_game = games[latest_game_index]["api_uri"]
 
     r = requests.get("https://api.thescore.com" + latest_game)
@@ -165,7 +164,12 @@ def generate_reaction():
   for key, value in data.iteritems() :
       print key
 
-  hitters = []
+  if 'battingSummaryBlurb' in data['extra']:
+      battingSummaryHtml = render_template('mlb-hitter-summary.html', data=data['player_records'], 
+        blurb=data['extra']['battingSummaryBlurb'], gradeImage=data['extra']['battingSummaryGrade'] if 'battingSummaryGrade' in data['extra'] else 'NA')
+
+
+  hitters = []  
   for p in data['player_records']:
     stats = render_template('mlb-hitter-stats.html', data=p)
     if ('blurb' in p and p['blurb'] != ''):
@@ -189,7 +193,7 @@ def generate_reaction():
 
 
   print pitchers
-  html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml)
+  html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml, battingSummaryHtml=battingSummaryHtml)
 
   return jsonify({"html": html});
 

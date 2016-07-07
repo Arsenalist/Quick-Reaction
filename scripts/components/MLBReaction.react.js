@@ -16,6 +16,7 @@ var MLBReaction = React.createClass({
         player_records: [],
         pitching_records: [],
         manager: {},
+        extra: {},
         thinking: false,
         selectedTeam: ''
       }
@@ -50,18 +51,20 @@ var MLBReaction = React.createClass({
       for (var i = 0; i< this.state.player_records.length; i++) {
         if (e.target.id == this.state.player_records[i].id) {
           this.state.player_records[i].blurb = e.target.value;
-          break;
+          return;
         }
       }
       for (var i = 0; i< this.state.pitching_records.length; i++) {
         if (e.target.id == this.state.pitching_records[i].id) {
           this.state.pitching_records[i].blurb = e.target.value;
-          break;
+          return;
         }
       }
       if (e.target.id == this.state.manager.name) {
         this.state.manager.blurb = e.target.value;
+        return;
       }
+      this.state.extra[e.target.id] = e.target.value;
   },
   handleGradeChange: function(e) {
       for (var i = 0; i< this.state.player_records.length; i++) {
@@ -79,7 +82,7 @@ var MLBReaction = React.createClass({
       if (e.target.id == this.state.manager.name) {
         this.state.manager.grade = e.target.value;
       }
-
+      this.state.extra[e.target.id] = e.target.value;      
   },
   _onChange: function() {
     var box = AppStore.getPlayers();
@@ -93,7 +96,6 @@ var MLBReaction = React.createClass({
           html: html
         }
     );
-    console.log("html is", html);
   },
 
 

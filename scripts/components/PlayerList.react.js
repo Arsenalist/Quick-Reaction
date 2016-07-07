@@ -1,5 +1,6 @@
 var Hitter = require('./Hitter.react.js');
 var Pitcher = require('./Pitcher.react.js');
+var BattingSummary = require('./BattingSummary.react.js');
 var Manager = require('./Manager.react.js');
 var React = require('react');
 
@@ -25,6 +26,10 @@ var PlayerList = React.createClass({
     }
     return (
       <div className="blurbs">
+      <h3>Batting</h3>
+      <div className="battingSummary">
+        <BattingSummary handleTextChange={this.props.handleTextChange} handleGradeChange={this.props.handleGradeChange} data={this.props.playerRecords}/>
+      </div>
       <h3>Hitters</h3>
       <div className="playerList">
           {hitters}

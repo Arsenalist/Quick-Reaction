@@ -1,6 +1,11 @@
 <div class="container-fluid">
+{% if battingSummaryHtml %}
+  <h3>Batting Summary</h3>
+    {{battingSummaryHtml|safe}}
+{% endif %}
 <h3>Hitters</h3>
 {% if hitters %}
+  <h3>Hitters</h3>
   {% for h in hitters %}
     {{h|safe}}
   {% endfor %}
