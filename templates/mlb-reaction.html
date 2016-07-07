@@ -1,24 +1,31 @@
 <div class="container-fluid">
+{% if startingPitcherHtml %}
+<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Starter</div>
+    {{startingPitcherHtml|safe}}
+{% endif %}
+{% if bullpenSummaryHtml %}
+<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Bullpen</div>
+    {{bullpenSummaryHtml|safe}}
+{% endif %}
+<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Hitting</div>
 {% if battingSummaryHtml %}
-  <h3>Batting Summary</h3>
     {{battingSummaryHtml|safe}}
 {% endif %}
-<h3>Hitters</h3>
+{% if managerHtml %}
+  <div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Manager</div>
+  {{managerHtml|safe}}
+{% endif %}  
 {% if hitters %}
-  <h3>Hitters</h3>
+<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">Notable Hitters</div>
   {% for h in hitters %}
     {{h|safe}}
   {% endfor %}
 {% endif %}
 {% if pitchers %}
-  <h3>Pitchers</h3>
+<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">Notable Pitchers</div>
   {% for p in pitchers %}
     {{p|safe}}
   {% endfor %}
 {% endif %}
-{% if managerHtml %}
-  <h3>Manager</h3>
-  {{managerHtml|safe}}
-{% endif %}  
 </div>
   

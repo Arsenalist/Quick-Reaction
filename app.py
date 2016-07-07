@@ -164,9 +164,60 @@ def generate_reaction():
   for key, value in data.iteritems() :
       print key
 
+
   if 'battingSummaryBlurb' in data['extra']:
+
+      totals = [0] * len(data['player_records'])
+      i = 0
+      for p in data['player_records']:
+        totals[i] = p['home_runs'] + p['runs_batted_in'] + p['runs'] + p['walks']
+        i = i + 1
+
+      biggestValue = 0
+      biggestIndex = 0
+      i = 0 
+      for t in totals:
+        if t > biggestValue:
+          biggestIndex = i
+          biggestValue = t
+        i = i + 1
+
       battingSummaryHtml = render_template('mlb-hitter-summary.html', data=data['player_records'], 
-        blurb=data['extra']['battingSummaryBlurb'], gradeImage=data['extra']['battingSummaryGrade'] if 'battingSummaryGrade' in data['extra'] else 'NA')
+        blurb=data['extra']['battingSummaryBlurb'], gradeImage=data['extra']['battingSummaryGrade'] if 'battingSummaryGrade' in data['extra'] else 'NA', 
+        personImage=data['player_records'][biggestIndex]['player']['headshots']['w192xh192'])
+
+
+  starter = None
+  bullpen = []
+  for p in data['pitching_records']:
+    if p['sequence'] == 1:
+      starter = p
+    else:
+      bullpen.append(p)
+
+
+  if bullpen and 'bullpenSummaryBlurb' in data['extra']:
+      bullpenSummaryHtml = render_template('mlb-pitching-summary.html', data=bullpen, 
+        blurb=data['extra']['bullpenSummaryBlurb'], gradeImage=data['extra']['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in data['extra'] else 'NA', 
+        personImage=bullpen[0]['player']['headshots']['w192xh192'])
+
+
+
+  if starter != None:
+    stats = render_template('mlb-pitcher-stats.html', data=starter)
+    if ('blurb' in starter and starter['blurb'] != ''):
+      startingPitcherHtml = render_template('evaluation.html', stats=stats, blurb=starter['blurb'], gradeImage=starter['grade'] if'grade' in starter else 'NA',
+        personName=starter['player']['first_initial_and_last_name'], personImage=starter['player']['headshots']['w192xh192'])
+
+
+  pitchers = []
+  for p in bullpen:
+    if p['sequence'] != 1:
+      stats = render_template('mlb-pitcher-stats.html', data=p)
+      if ('blurb' in p and p['blurb'] != ''):
+        evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if'grade' in p else 'NA',
+          personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
+        pitchers.append(evaluation)
 
 
   hitters = []  
@@ -177,23 +228,17 @@ def generate_reaction():
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       hitters.append(evaluation)
 
-  pitchers = []
-  for p in data['pitching_records']:
-    stats = render_template('mlb-pitcher-stats.html', data=p)
-    if ('blurb' in p and p['blurb'] != ''):
-      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if'grade' in p else 'NA',
-        personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
-      pitchers.append(evaluation)
 
   managerHtml = ''
-  if ('blurb' in data['manager'] and data['manager']['blurb'] != ''):
+  if 'managerBlurb' in data['extra']:
     manager = data['manager']
-    managerHtml = render_template('evaluation.html', stats='', blurb=manager['blurb'], gradeImage=p['grade'] if'grade' in p else 'NA',
+    managerHtml = render_template('evaluation.html', stats='', blurb=data['extra']['managerBlurb'], gradeImage=data['extra']['managerGrade'] if 'managerGrade' in data['extra'] else 'NA',
       personName=manager['name'], personImage=manager['image'])
 
 
   print pitchers
-  html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml, battingSummaryHtml=battingSummaryHtml)
+  html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml,
+   battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml)
 
   return jsonify({"html": html});
 

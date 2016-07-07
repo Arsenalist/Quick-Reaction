@@ -7,7 +7,10 @@ var Pitcher = React.createClass({
   },
   
   render: function() {
+    if (typeof this.props.data == 'undefined') return <div></div>;
     var data = this.props.data;
+
+    console.log("player data is ", data);
     return (      
         <div className="row" style={{marginTop: 10 + 'px'}}>
          <div className="col-xs-2">

@@ -60,10 +60,6 @@ var MLBReaction = React.createClass({
           return;
         }
       }
-      if (e.target.id == this.state.manager.name) {
-        this.state.manager.blurb = e.target.value;
-        return;
-      }
       this.state.extra[e.target.id] = e.target.value;
   },
   handleGradeChange: function(e) {
@@ -78,9 +74,6 @@ var MLBReaction = React.createClass({
           this.state.pitching_records[i].grade = e.target.value;
           break;
         }
-      }
-      if (e.target.id == this.state.manager.name) {
-        this.state.manager.grade = e.target.value;
       }
       this.state.extra[e.target.id] = e.target.value;      
   },

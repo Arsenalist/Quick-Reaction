@@ -17,10 +17,10 @@ var Manager = React.createClass({
             <strong>{data.name}</strong>
          </div>
          <div className="col-xs-8">
-            <textarea id={data.name} onChange={this.props.handleTextChange}  className="form-control" style={{height: '150px'}}></textarea>
+            <textarea id="managerBlurb" onChange={this.props.handleTextChange}  className="form-control" style={{height: '150px'}}></textarea>
          </div>
          <div className="col-xs-2">
-            <Grade id={data.name} handleGradeChange={this.props.handleGradeChange}/>
+            <Grade id="managerGrade" handleGradeChange={this.props.handleGradeChange}/>
          </div>
         </div>
     );
