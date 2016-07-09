@@ -1,4 +1,49 @@
 <div class="container-fluid">
+<div class="row">
+  <div class="col-xs-3 text-center">
+    <img src="{{overview.event.away_team.logos.small}}"/>
+    <h3>{{overview.event.away_team.medium_name}}</h3>
+  </div>
+  <div class="col-xs-6">
+    <table class="table table-condensed table-bordered">
+      <tr>
+        <th></th>
+        {% for seg in overview.line_scores.away %}
+          <th>{{seg.segment}}</th>
+        {% endfor %}
+        <th>R</th>
+        <th>H</th>
+        <th>E</th>
+      </tr>
+    </tr>
+    <tr>
+      <td>{{overview.event.away_team.medium_name}}</td>
+      {% for seg in overview.line_scores.away %}
+        <td>{{seg.score}}</td>
+      {% endfor %}    
+      <td><strong>{{overview.away_score_runs}}</strong></td>
+      <td><strong>{{overview.away_score_hits}}</strong></td>
+      <td><strong>{{overview.away_score_errors}}</strong></td>
+    </tr>
+    <tr>
+      <td>{{overview.event.home_team.medium_name}}</td>
+      {% for seg in overview.line_scores.home %}
+        <td>{{seg.score}}</td>
+      {% endfor %}    
+      <td><strong>{{overview.home_score_runs}}</strong></td>
+      <td><strong>{{overview.home_score_hits}}</strong></td>
+      <td><strong>{{overview.home_score_errors}}</strong></td>
+    </tr>
+    </table><p class="text-center">
+    {% if overview.winning_pitcher_record %}<strong>W: {{overview.winning_pitcher_record.player.first_initial_and_last_name}} {{overview.winning_pitcher_record.wins}}-{{overview.winning_pitcher_record.losses}}</strong><br/>
+    {% endif %}{% if overview.losing_pitcher_record %}<strong>L: {{overview.losing_pitcher_record.player.first_initial_and_last_name}} {{overview.losing_pitcher_record.wins}}-{{overview.losing_pitcher_record.losses}}</strong><br/>{% endif %}{% if overview.saving_pitcher_record %}<strong>S: {{overview.saving_pitcher_record.player.first_initial_and_last_name}} {{overview.saving_pitcher_record.wins}}-{{overview.saving_pitcher_record.losses}}</strong>{% endif %}</p>
+  </div>
+  <div class="col-xs-3 text-center">
+    <img src="{{overview.event.home_team.logos.small}}"/>
+    <h3>{{overview.event.home_team.medium_name}}</h3>
+  </div>
+</div>
+
 {% if startingPitcherHtml %}
 <div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Starter</div>
     {{startingPitcherHtml|safe}}

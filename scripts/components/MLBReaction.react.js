@@ -13,6 +13,7 @@ var MLBReaction = React.createClass({
   getInitialState: function() {
     return (
       {
+        overview: {},
         player_records: [],
         pitching_records: [],
         manager: {},
@@ -81,6 +82,7 @@ var MLBReaction = React.createClass({
     var html = AppStore.getMlbReactionHtml().html;
     this.setState(
         {
+          overview: box.overview,
           player_records: box.player_records,
           pitching_records: box.pitching_records,
           manager: box.manager,
