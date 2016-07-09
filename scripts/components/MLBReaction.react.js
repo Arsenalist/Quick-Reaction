@@ -47,7 +47,6 @@ var MLBReaction = React.createClass({
     jQuery("body").scrollTop(0);
   },
   handleTextChange: function(e) {
-      console.log(e.target.id, e.target.value);
       for (var i = 0; i< this.state.player_records.length; i++) {
         if (e.target.id == this.state.player_records[i].id) {
           this.state.player_records[i].blurb = e.target.value;

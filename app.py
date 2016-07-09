@@ -110,6 +110,20 @@ class MLB:
     pitching_records = requests.get("https://api.thescore.com" + box_score_uri + "/pitching_records").json()
     player_records = requests.get("https://api.thescore.com" + box_score_uri + "/player_records?rpp=-1").json()
 
+    # add won/loss info to pitching_records
+    for p in pitching_records:  
+      print p['player']['first_initial_and_last_name']  
+      record = ''
+      if p["game_lost"]:
+        record = record + 'L, '
+      if p["game_won"]:
+        record = record + 'W, '
+      if p["game_saved"]:
+        record = record + 'S, '
+      record = record + str(p["wins"]) + "-" + str(p["losses"])
+      print record
+      p["record"] = record
+
     return BoxScore(overview, summaries, player_statistics, pitching_records, player_records)
 
 

@@ -7,18 +7,19 @@ var BullpenSummary = React.createClass({
   },
   
   render: function() {
-    console.log("pitchers is ", this.state.pitchers);
     var pitcherRows = this.state.pitchers.map(function (p) {
+
           return (
                 <tr>
-                    <td>{p.player.first_initial_and_last_name}</td>
+                    <td>{p.player.first_initial_and_last_name} ({p.record})</td>
                     <td>{p.innings_pitched}</td>
                     <td>{p.runs}</td>                    
                     <td>{p.earned_runs} </td>
                     <td>{p.hits}</td>
                     <td>{p.walks}</td>
                     <td>{p.strike_outs}</td>
-                    <td>{p.pitch_count}</td>
+                    <td>{p.pitch_count} ({p.balls}-{p.strikes})</td>
+                    <td>{p.earned_run_average}</td>
                 </tr>
             )
       });
@@ -34,7 +35,8 @@ var BullpenSummary = React.createClass({
                     <th>H</th>
                     <th>BB</th>
                     <th>SO</th>
-                    <th>PC</th>
+                    <th>PC (B-S)</th>
+                    <th>ERA</th>
                 </tr>
                 {pitcherRows}
             </table>

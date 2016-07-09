@@ -18,6 +18,9 @@ var BattingSummary = React.createClass({
                     <td>{p.strike_outs}</td>
                     <td>{p.doubles}-{p.triples}-{p.home_runs}</td>
                     <td>{p.stolen_bases}</td>
+                    <td>{p.short_batting_average}</td>
+                    <td>{p.on_base_percentage}</td>
+                    <td>{p.slugging_percentage}</td>                    
                 </tr>
             )
       });
@@ -34,6 +37,9 @@ var BattingSummary = React.createClass({
                     <th>SO</th>
                     <th>2B-3B-HR</th>
                     <th>SB</th>
+                    <th>AVG</th>
+                    <th>OBP</th>
+                    <th>Slug</th>                    
                 </tr>
                 {hitterRows}
             </table>
