@@ -1,10 +1,27 @@
-<div class="container-fluid">
+<style>.mlb-reaction .section-header {background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em} .mlb-reaction .grade {background: #315233; border: 6px solid #977252; color: white; font-size:35px; font-weight: bold; text-align: center; width: 100%; margin-top: 10px} .free-form-number { border: 3px solid #808080; color: #808080; font-size:35px; font-weight: bold; text-align: center; height: 50px; width: 50px;}</style>
+
+<div class="container-fluid mlb-reaction">
 <div class="row">
-  <div class="col-xs-3 text-center">
-    <img src="{{overview.event.away_team.logos.small}}"/>
-    <h3>{{overview.event.away_team.medium_name}}</h3>
+  <div class="col-xs-6 col-md-offset-4 col-md-2 text-right">
+    <img src="{{overview.event.away_team.logos.w72xh72}}"/>    
   </div>
-  <div class="col-xs-6">
+  <div class="col-xs-6  col-md-6">
+    <h3>{{overview.event.away_team.medium_name}} {{overview.away_score_runs}}</h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-6 col-md-offset-4 col-md-2 text-right">
+    <img src="{{overview.event.home_team.logos.w72xh72}}"/>    
+  </div>
+  <div class="col-xs-6 col-md-6">
+    <h3>{{overview.event.home_team.medium_name}} {{overview.home_score_runs}}</h3>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-xs-12">
     <table class="table table-condensed table-bordered">
       <tr>
         <th></th>
@@ -38,54 +55,44 @@
     {% if overview.winning_pitcher_record %}<strong>W: {{overview.winning_pitcher_record.player.first_initial_and_last_name}} {{overview.winning_pitcher_record.wins}}-{{overview.winning_pitcher_record.losses}}</strong><br/>
     {% endif %}{% if overview.losing_pitcher_record %}<strong>L: {{overview.losing_pitcher_record.player.first_initial_and_last_name}} {{overview.losing_pitcher_record.wins}}-{{overview.losing_pitcher_record.losses}}</strong><br/>{% endif %}{% if overview.saving_pitcher_record %}<strong>S: {{overview.saving_pitcher_record.player.first_initial_and_last_name}} {{overview.saving_pitcher_record.wins}}-{{overview.saving_pitcher_record.losses}}</strong>{% endif %}</p>
   </div>
-  <div class="col-xs-3 text-center">
-    <img src="{{overview.event.home_team.logos.small}}"/>
-    <h3>{{overview.event.home_team.medium_name}}</h3>
-  </div>
 </div>
 
 {% if startingPitcherHtml %}
-<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Starter</div>
+<div class="section-header">The Starter</div>
     {{startingPitcherHtml|safe}}
 {% endif %}
 {% if bullpenSummaryHtml %}
-<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Bullpen</div>
+<div class="section-header">The Bullpen</div>
     {{bullpenSummaryHtml|safe}}
 {% endif %}
 {% if battingSummaryHtml %}
-    <div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Hitting</div>
+    <div class="section-header">The Hitting</div>
     {{battingSummaryHtml|safe}}
 {% endif %}
 {% if managerHtml %}
-  <div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">The Manager</div>
+  <div class="section-header">The Manager</div>
   {{managerHtml|safe}}
 {% endif %}  
 {% if hitters %}
-<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">Notable Hitters</div>
+<div class="section-header">Notable Hitters</div>
   {% for h in hitters %}
     {{h|safe}}
   {% endfor %}
 {% endif %}
 {% if pitchers %}
-<div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">Notable Pitchers</div>
+<div class="section-header">Notable Pitchers</div>
   {% for p in pitchers %}
     {{p|safe}}
   {% endfor %}
 {% endif %}
 {% if freeForm %}
-  <div style="background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em">Extra Innings</div>
+  <div class="section-header">Extra Innings</div>
   {% for f in freeForm %}
     <div class="media" style="margin-bottom: 10px">
-      <div class="media-left media-top" style="width:100px">
-        <a href="#">
-          <div style="background: black; color: white; font-size:35px; font-weight: bold; text-align: center; width: 100px;">{{loop.index}}</div>
-        </a>
+      <div class="media-left media-top">
+          <div class="free-form-number">{{loop.index}}</div>
       </div>
-      <div class="media-body">
-        <p>
-            {{f|safe}}
-        </p>
-      </div>
+      <div class="media-body">{{f|safe}}</div>
     </div>
   {% endfor %}   
 {% endif %}  

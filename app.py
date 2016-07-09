@@ -5,6 +5,8 @@ import os
 from flask import Flask, request, jsonify, send_from_directory, render_template
 app = Flask(__name__, static_url_path='')
 app.Debug = True
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
 
 @app.route('/scripts/<path:path>')
 def send_js(path):
@@ -112,7 +114,6 @@ class MLB:
 
     # add won/loss info to pitching_records
     for p in pitching_records:  
-      print p['player']['first_initial_and_last_name']  
       record = ''
       if p["game_lost"]:
         record = record + 'L, '
@@ -121,7 +122,6 @@ class MLB:
       if p["game_saved"]:
         record = record + 'S, '
       record = record + str(p["wins"]) + "-" + str(p["losses"])
-      print record
       p["record"] = record
 
     return BoxScore(overview, summaries, player_statistics, pitching_records, player_records)
@@ -175,9 +175,6 @@ def get_box(id):
 @app.route("/mlb/generate-reaction", methods=['POST'])
 def generate_reaction():
   data = json.loads(request.form["data"])
-  for key, value in data.iteritems() :
-      print key
-
   battingSummaryHtml = None
   bullpenSummaryHtml = None
   managerHtml = None
