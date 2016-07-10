@@ -22,6 +22,7 @@
 
 <div class="row">
   <div class="col-xs-12">
+        <div class="table-responsive">
     <table class="table table-condensed table-bordered">
       <tr>
         <th></th>
@@ -51,7 +52,7 @@
       <td><strong>{{overview.home_score_hits}}</strong></td>
       <td><strong>{{overview.home_score_errors}}</strong></td>
     </tr>
-    </table><p class="text-center">
+    </table></div><p class="text-center">
     {% if overview.winning_pitcher_record %}<strong>W: {{overview.winning_pitcher_record.player.first_initial_and_last_name}} {{overview.winning_pitcher_record.wins}}-{{overview.winning_pitcher_record.losses}}</strong><br/>
     {% endif %}{% if overview.losing_pitcher_record %}<strong>L: {{overview.losing_pitcher_record.player.first_initial_and_last_name}} {{overview.losing_pitcher_record.wins}}-{{overview.losing_pitcher_record.losses}}</strong><br/>{% endif %}{% if overview.saving_pitcher_record %}<strong>S: {{overview.saving_pitcher_record.player.first_initial_and_last_name}} {{overview.saving_pitcher_record.wins}}-{{overview.saving_pitcher_record.losses}}</strong>{% endif %}</p>
   </div>
