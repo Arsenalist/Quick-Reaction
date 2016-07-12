@@ -3,6 +3,14 @@ import json
 from bs4 import BeautifulSoup
 import os
 from flask import Flask, request, jsonify, send_from_directory, render_template
+from wordpress_xmlrpc import Client, WordPressPost
+from wordpress_xmlrpc.methods.posts import NewPost
+from wordpress_xmlrpc.methods import posts, taxonomies, users
+import datetime, yaml
+from dotmap import DotMap
+
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
+
 app = Flask(__name__, static_url_path='')
 app.Debug = True
 app.jinja_env.trim_blocks = True
@@ -170,6 +178,40 @@ def get_box(id):
 
 
   return jsonify(context)
+
+def read_file(file_name):
+  f = open(file_name)
+  contents = f.read()
+  f.close()
+  return contents
+
+def get_config():
+  return yaml.load(read_file(os.path.join(APP_ROOT, 'config/config.yaml')))
+
+def create_wordpress_draft(title, html, tags):
+  config = get_config()
+  post = WordPressPost()
+  today = datetime.date.today()
+  post.title = title
+  post.content = html
+  wordpress_username = os.environ.get('wordpress_username', config["wordpress"]["username"])
+  wordpress_password = os.environ.get('wordpress_password', config["wordpress"]["password"])
+  client = Client( config["wordpress"]["url"] + "/xmlrpc.php",  wordpress_username,  wordpress_password)
+  category = client.call(taxonomies.GetTerm('category',  config["wordpress"]["default_category_id"]))
+  post.terms.append(category)
+  post.user = config["wordpress"]["default_user_id"]
+  post.terms_names = {'post_tag': tags}
+  post.comment_status = 'open'
+  post.id = client.call(posts.NewPost(post))
+  return post
+
+@app.route("/mlb/create-draft", methods=['POST'])
+def create_draft():
+  data = DotMap(json.loads(request.form["data"]))
+  title = 'Quick Reaction: ' + data.overview.event.home_team.full_name + ' ' + str(data.overview.home_score_runs) + ', ' + data.overview.event.away_team.full_name + ' ' + str(data.overview.away_score_runs)
+  tags = [data.overview.event.home_team.full_name, data.overview.event.away_team.full_name]
+  post = create_wordpress_draft(title, data.html, tags)
+  return jsonify({"status": "OK", "url": "http://www.bluejaysrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
 
 
 @app.route("/mlb/generate-reaction", methods=['POST'])

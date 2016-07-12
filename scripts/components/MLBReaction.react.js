@@ -1,4 +1,5 @@
 var AppStore = require('../stores/AppStore.js');
+var AppActions = require('../actions/AppActions.js');
 var AppActionCreator = require('../actioncreators/AppActionCreators.js');
 var TeamSelector = require('./TeamSelector.react.js');
 var PlayerList = require('./PlayerList.react.js');
@@ -19,7 +20,9 @@ var MLBReaction = React.createClass({
         manager: {},
         extra: {},
         thinking: false,
-        selectedTeam: ''
+        thinkingCreatingDraft: false,
+        selectedTeam: '',
+        createDraftResult: {}
       }
     );
   },
@@ -44,7 +47,8 @@ var MLBReaction = React.createClass({
   },
 
   handleGenerate: function(e) {
-    AppActionCreator.getMlbReactionHtml(this.state);   
+   AppActions.setCreateDraftResult({})
+   AppActionCreator.getMlbReactionHtml(this.state);     
     jQuery("body").scrollTop(0);
   },
   handleTextChange: function(e) {
@@ -77,9 +81,15 @@ var MLBReaction = React.createClass({
       }
       this.state.extra[e.target.id] = e.target.value;      
   },
+  createDraft: function() {
+    this.state.thinkingCreatingDraft = true;
+    this.setState(this.state);
+    AppActionCreator.createMlbDraft(this.state);
+  },
   _onChange: function() {
     var box = AppStore.getPlayers();
     var html = AppStore.getMlbReactionHtml().html;
+    var createDraftResult = AppStore.getCreateDraftResult();
     this.setState(
         {
           overview: box.overview,
@@ -87,7 +97,9 @@ var MLBReaction = React.createClass({
           pitching_records: box.pitching_records,
           manager: box.manager,
           thinking: false,
-          html: html
+          thinkingCreatingDraft: false,
+          html: html,
+          createDraftResult: createDraftResult
         }
     );
   },
@@ -99,12 +111,20 @@ var MLBReaction = React.createClass({
           <div>Hold up, doing stuff...</div>
       );
     } 
-    var generateButton = null;  
+    var generateButton = null, createDraftButton = null;  
     if (typeof this.state.player_records != 'undefined' && this.state.player_records.length != 0) {
       generateButton = <p><input type="button" onClick={this.handleGenerate} className="btn-lg btn-primary btn" value="Generate"/></p>;
     } else {
       generateButton = null;
     }
+    if (typeof this.state.html != 'undefined') {
+      createDraftButton = <p><input type="button" onClick={this.createDraft} className={(this.state.thinkingCreatingDraft ? 'disabled' : '') + " btn-lg btn-primary btn"} value="Create Draft"/></p>;
+    }
+    var draftLink = null;
+    if (this.state.createDraftResult.status == 'OK') {
+      draftLink = <a href={this.state.createDraftResult.url} target="_blank">Draft created - click here to view</a>
+    }
+
 
     return (
       <div className="row">      
@@ -121,6 +141,8 @@ var MLBReaction = React.createClass({
         </div>
         <div className="col-xs-6">
             <div dangerouslySetInnerHTML={{__html: typeof this.state.html == 'undefined' ? '' : '<textarea onclick="this.select()" style="width:100%">' + this.state.html + '</textarea>'}} />
+            {createDraftButton}  
+            {draftLink}          
             <div dangerouslySetInnerHTML={{__html: this.state.html}} />
         </div>
 

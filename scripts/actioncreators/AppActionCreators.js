@@ -28,10 +28,21 @@ var AppActionCreator = {
           dataType: "json",
           data: {data: JSON.stringify(data)},
           success: function (data) {
-              AppActions.setMlbReactionHtml(data);
+              AppActions.setMlbReactionHtml(data);              
           }
       });
-  }
+  },
+  createMlbDraft: function(data) {
+      jQuery.ajax({
+          url: "/mlb/create-draft",
+          type: "POST",
+          dataType: "json",
+          data: {data: JSON.stringify(data)},
+          success: function (data) {
+            AppActions.setCreateDraftResult(data);
+          }
+      });
+  }  
 }
 
 module.exports = AppActionCreator;

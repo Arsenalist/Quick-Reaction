@@ -12,6 +12,7 @@ var _formation = null;
 var _message = null;
 var _location = null
 var _mlbReactionHtml = {};
+var _createDraftResult = {};
 
 var AppStore = assign({}, EventEmitter.prototype, {
 
@@ -24,7 +25,9 @@ var AppStore = assign({}, EventEmitter.prototype, {
   getTeams: function() {
     return _teams;
   },
-
+  getCreateDraftResult: function() {
+    return _createDraftResult;
+  },
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
@@ -60,6 +63,9 @@ AppDispatcher.register(function(action) {
        _mlbReactionHtml = action.mlbReactionHtml;
       AppStore.emitChange();
          break;
+    case AppConstants.SET_CREATE_DRAFT_RESULT:
+      _createDraftResult = action.result;
+      AppStore.emitChange();
     default:
       // no op
   }
