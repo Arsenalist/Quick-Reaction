@@ -272,11 +272,11 @@ def create_wordpress_draft(title, html, tags):
   post.id = client.call(posts.NewPost(post))
   return post
 
-@app.route("/mlb/create-draft", methods=['POST'])
+@app.route("/create-draft", methods=['POST'])
 def create_draft():
   data = DotMap(json.loads(request.form["data"]))
-  title = 'Quick Reaction: ' + data.overview.event.home_team.full_name + ' ' + str(data.overview.home_score_runs) + ', ' + data.overview.event.away_team.full_name + ' ' + str(data.overview.away_score_runs)
-  tags = [data.overview.event.home_team.full_name, data.overview.event.away_team.full_name]
+  title = 'Quick Reaction: ' + data.context.event.home_team.full_name + ' ' + str(data.context.home_score_runs) + ', ' + data.context.event.away_team.full_name + ' ' + str(data.context.away_score_runs)
+  tags = [data.context.event.home_team.full_name, data.context.event.away_team.full_name]
   post = create_wordpress_draft(title, data.html, tags)
   return jsonify({"status": "OK", "url": "http://www.bluejaysrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
 

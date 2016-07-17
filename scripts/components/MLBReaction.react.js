@@ -3,6 +3,7 @@ var AppActions = require('../actions/AppActions.js');
 var AppActionCreator = require('../actioncreators/AppActionCreators.js');
 var TeamSelector = require('./TeamSelector.react.js');
 var PlayerList = require('./PlayerList.react.js');
+var ReactionPreview = require('./ReactionPreview.react.js');
 var jQuery = require('jquery/dist/jquery');
 
 
@@ -63,15 +64,9 @@ var MLBReaction = React.createClass({
   handleGradeChange: function(e) {
       this.state.evaluation.grades[e.target.id + ''] = e.target.value;
   },
-  createDraft: function() {
-    this.state.thinkingCreatingDraft = true;
-    this.setState(this.state);
-    AppActionCreator.createMlbDraft(this.state);
-  },
   _onChange: function() {
     var box = AppStore.getPlayers();
     var html = AppStore.getMlbReactionHtml().html;
-    var createDraftResult = AppStore.getCreateDraftResult();
     this.setState(
         {
           overview: box.overview,
@@ -79,10 +74,8 @@ var MLBReaction = React.createClass({
           pitching_records: box.pitching_records,
           manager: box.manager,
           thinking: false,
-          thinkingCreatingDraft: false,
           thinkingGenerateReaction: false,
-          html: html,
-          createDraftResult: createDraftResult
+          html: html
         }
     );
   },
@@ -100,20 +93,12 @@ var MLBReaction = React.createClass({
     } else {
       generateButton = null;
     }
-    if (typeof this.state.html != 'undefined') {
-      createDraftButton = <p><input type="button" onClick={this.createDraft} className={(this.state.thinkingCreatingDraft ? 'disabled' : '') + " btn-lg btn-primary btn"} value="Create Draft"/></p>;
-    }
-    var draftLink = null;
-    if (this.state.createDraftResult.status == 'OK') {
-      draftLink = <a href={this.state.createDraftResult.url} target="_blank">Draft created - click here to view</a>
-    }
     var rightSide = null;
     if (this.state.thinkingGenerateReaction) {
       rightSide = <div>Generating reaction...</div>
     } else {
-      rightSide = <div><div dangerouslySetInnerHTML={{__html: typeof this.state.html == 'undefined' ? '' : '<textarea onclick="this.select()" style="width:100%">' + this.state.html + '</textarea>'}} />{createDraftButton} {draftLink}<div dangerouslySetInnerHTML={{__html: this.state.html}} /></div>
+      rightSide = <ReactionPreview type="mlb-reaction" context={this.state.overview} html={this.state.html} />
     }
-
 
     return (
       <div className="row">      
@@ -130,7 +115,7 @@ var MLBReaction = React.createClass({
                 
         </div>
         <div className="col-xs-6">
-            {rightSide}
+            {rightSide}            
         </div>
 
       </div>

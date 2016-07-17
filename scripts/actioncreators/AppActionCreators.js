@@ -37,9 +37,9 @@ var AppActionCreator = {
           }
       });
   },
-  createMlbDraft: function(data) {
+  createDraft: function(data) {
       jQuery.ajax({
-          url: "/mlb/create-draft",
+          url: "/create-draft",
           type: "POST",
           dataType: "json",
           data: {data: JSON.stringify(data)},
