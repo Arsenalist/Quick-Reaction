@@ -32,6 +32,57 @@ def get(uri):
   else:
     raise Exception("boom!")
 
+
+class TheScore:
+
+  def find_latest_game(self, team_uri):
+    r = requests.get("https://api.thescore.com" + team_uri + "/events/full_schedule?rpp=-1")
+    games = r.json()
+    status = ["in_progress", "final"]
+    latest_index = -1
+    i = 0;
+    for g in games:
+      if g["event_status"] in status:
+        latest_index = i
+      i = i + 1
+    return games[latest_index]
+
+  def get_alignment(self, box_score, team_id):
+    home_team_id = box_score['event']['home_team']['id']
+    away_team_id = box_score['event']['away_team']['id']
+    if team_id == home_team_id:
+      return "home"
+    if team_id == away_team_id:
+      return "away"
+    raise Exception("Could not determine alignment for " + str(team_id))
+
+  def filter_by_alignment(self, records, alignment):
+    filtered_records = []
+    for r in records:
+      if r["alignment"] == alignment:
+        filtered_records.append(r)
+    return filtered_records
+
+
+
+class MLS(TheScore):
+
+  def get_teams(self):
+    return get('/mls/teams/')
+
+
+  def get_latest_box_score(self, team_id):
+    latest_game = self.find_latest_game('/mls/teams/' + str(team_id))
+    game = get(latest_game["api_uri"])
+    box_score_uri = game["box_score"]["api_uri"]
+
+    return {
+      'overview': get(box_score_uri),
+      'player_records': get(box_score_uri + '/player_records?rpp=-1'),
+      'goalie_records': get(box_score_uri + '/goalie_records?rpp=-1')
+    }
+
+
 class BoxScore:
   def __init__(self, overview, summaries, player_statistics, pitching_records, player_records):
     self.overview = overview
@@ -39,15 +90,6 @@ class BoxScore:
     self.player_statistics = player_statistics
     self.pitching_records = pitching_records
     self.player_records = player_records
-
-  def get_alignment(self, team_id):
-    home_team_id = self.overview['event']['home_team']['id']
-    away_team_id = self.overview['event']['away_team']['id']
-    if team_id == home_team_id:
-      return "home"
-    if team_id == away_team_id:
-      return "away"
-    raise Exception("Could not determine alignment for " + str(team_id))
 
 
 class Manager:
@@ -58,13 +100,7 @@ class Manager:
     self.uri = uri
 
 
-class MLBStats:
-
-
-  def get_hitter_stat_line(player):
-    pass
-
-class MLB:
+class MLB(TheScore):
 
   def get_teams(self):
     return get("/mlb/teams/")
@@ -127,23 +163,9 @@ class MLB:
     return manager
 
 
-  def find_latest_game_index_by_status(self, games, status):
-    latest_index = -1
-    i = 0;
-    for g in games:
-      if g["event_status"] == status:
-        latest_index = i
-      i = i + 1
-    return latest_index
-
   def get_latest_box_score(self, team_id):
-    r = requests.get("https://api.thescore.com/mlb/teams/" + str(team_id) + "/events/full_schedule?rpp=-1")
-    games = r.json()
-    latest_game_index = max(self.find_latest_game_index_by_status(games, 'in_progress'), self.find_latest_game_index_by_status(games, 'final'))
-    latest_game = games[latest_game_index]["api_uri"]
-
-    r = requests.get("https://api.thescore.com" + latest_game)
-    game = r.json()
+    latest_game = self.find_latest_game('/mlb/teams/' + str(team_id))
+    game = get(latest_game["api_uri"])
     box_score_uri = game["box_score"]["api_uri"]
 
     overview = requests.get("https://api.thescore.com" + box_score_uri).json()
@@ -169,25 +191,31 @@ class MLB:
 
 from flask import render_template
 
+def get_aligned_mls_box_score(team_id):
+  mls = MLS()
+  box = mls.get_latest_box_score(team_id)
+  alignment = mls.get_alignment(box['overview'], team_id)
+
+  relevant_player_records = mls.filter_by_alignment(box['player_records'], alignment)
+  relevant_goalie_records = mls.filter_by_alignment(box['goalie_records'], alignment)
+
+  context = {
+    "overview": box['overview'],
+    "player_records": relevant_player_records,
+    "goalie_records": relevant_goalie_records
+  }
+  return context
 
 def get_aligned_box_score(team_id):
+  
   mlb = MLB()
   box = mlb.get_latest_box_score(team_id)
-  alignment = box.get_alignment(team_id)
+  alignment = mlb.get_alignment(box.overview, team_id)
 
-  relevant_pitching_records = []
-  for p in box.pitching_records:
-    if p["alignment"] == alignment:
-      relevant_pitching_records.append(p)
-
-  relevant_player_records = []
-  for p in box.player_records:
-    if p["alignment"] == alignment:
-      relevant_player_records.append(p)
+  relevant_pitching_records = mlb.filter_by_alignment(box.pitching_records, alignment)
+  relevant_player_records = mlb.filter_by_alignment(box.player_records, alignment)
 
   manager = mlb.get_manager(box.overview["event"][alignment + "_team"]["full_name"])
-
-
 
   context = {
     "overview": box.overview,
@@ -206,8 +234,15 @@ def get_teams():
     mlb = MLB()
     return jsonify(mlb.get_teams())
 
+
+@app.route("/mls/box/<id>")
+def get_mls_box(id):
+  context = get_aligned_mls_box_score(int(id))
+  return jsonify(context)
+
+
 @app.route("/mlb/box/<id>")
-def get_box(id):
+def get_mlb_box(id):
   context = get_aligned_box_score(int(id))
   return jsonify(context)
 
@@ -245,20 +280,19 @@ def create_draft():
   post = create_wordpress_draft(title, data.html, tags)
   return jsonify({"status": "OK", "url": "http://www.bluejaysrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
 
-def apply_payload_to_data(payload, data):
-  for p in data['pitching_records']:
-    p['blurb'] = payload['blurbs'][str(p['id'])] if str(p['id']) in payload['blurbs'] else None
-    p['grade'] = payload['grades'][str(p['id'])] if str(p['id']) in payload['grades'] else None
-
-  for p in data['player_records']:
-    p['blurb'] = payload['blurbs'][p['id']] if p['id'] in payload['blurbs'] else None
-    p['grade'] = payload['grades'][p['id']] if p['id'] in payload['grades'] else None
-
-  return data
+def apply_evaluation(evaluation, records):
+  for p in records:
+    p['blurb'] = evaluation['blurbs'][str(p['id'])] if str(p['id']) in evaluation['blurbs'] else None
+    p['grade'] = evaluation['grades'][str(p['id'])] if str(p['id']) in evaluation['grades'] else None
+  return records
 
 @app.route("/mlb/generate-reaction", methods=['POST'])
 def generate_reaction():
   payload = json.loads(request.form["data"])
+  evaluation = payload['evaluation']
+  blurbs = evaluation['blurbs']
+  grades = evaluation['grades']
+
   data = get_aligned_box_score(int(payload['team_id']))
   mlb = MLB()
   battingSummaryHtml = None
@@ -266,22 +300,23 @@ def generate_reaction():
   managerHtml = None
   startingPitcherHtml = None
 
-
-  data = apply_payload_to_data(payload, data)
+  data['pitching_records'] = apply_evaluation(evaluation, data['pitching_records'])
+  data['player_records'] = apply_evaluation(evaluation, data['player_records'])
 
   starter = mlb.get_starter(data['pitching_records'])
   bullpen =  mlb.get_bullpen(data['pitching_records'])
 
+
   
-  if 'battingSummaryBlurb' in payload['extra']:
+  if 'battingSummaryBlurb' in blurbs:
       most_bases = mlb.get_player_with_most_bases(data['player_records'])
       battingSummaryHtml = render_template('mlb-hitter-summary.html', data=data['player_records'], 
-        blurb=payload['extra']['battingSummaryBlurb'], gradeImage=payload['extra']['battingSummaryGrade'] if 'battingSummaryGrade' in payload['extra'] else 'NA', 
+        blurb=blurbs['battingSummaryBlurb'], gradeImage=grades['battingSummaryGrade'] if 'battingSummaryGrade' in grades else 'NA', 
         personImage=most_bases['player']['headshots']['w192xh192'])
 
-  if bullpen and 'bullpenSummaryBlurb' in payload['extra']:
+  if bullpen and 'bullpenSummaryBlurb' in blurbs:
       bullpenSummaryHtml = render_template('mlb-pitching-summary.html', data=bullpen, 
-        blurb=payload['extra']['bullpenSummaryBlurb'], gradeImage=payload['extra']['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in payload['extra'] else 'NA', 
+        blurb=blurbs['bullpenSummaryBlurb'], gradeImage=grades['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in grades else 'NA', 
         personImage=bullpen[0]['player']['headshots']['w192xh192'])
 
   if ('blurb' in starter and starter['blurb'] != None):
@@ -306,16 +341,16 @@ def generate_reaction():
       hitters.append(evaluation)
 
   managerHtml = ''
-  if 'managerBlurb' in payload['extra']:
+  if 'managerBlurb' in blurbs:
     manager = data['manager']
-    managerHtml = render_template('evaluation.html', stats='', blurb=payload['extra']['managerBlurb'], gradeImage=payload['extra']['managerGrade'] if 'managerGrade' in payload['extra'] else 'NA',
+    managerHtml = render_template('evaluation.html', stats='', blurb=blurbs['managerBlurb'], gradeImage=grades['managerGrade'] if 'managerGrade' in grades else 'NA',
       personName=manager['name'], personImage=manager['image'])
 
 
   freeForm = []
   for x in range(0, 5):
-    if 'freeForm' + str(x) in payload['extra']:
-      freeForm.append(payload['extra']['freeForm' + str(x)])
+    if 'freeForm' + str(x) in blurbs:
+      freeForm.append(blurbs['freeForm' + str(x)])
 
   html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml,
    battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml, freeForm=freeForm, overview=data["overview"])

@@ -17,15 +17,16 @@ var MLBReaction = React.createClass({
         overview: {},
         player_records: [],
         pitching_records: [],
+        evaluation: {
+          blurbs: {},
+          grades: {}
+        },
         manager: {},
-        extra: {},
         thinking: false,
         thinkingCreatingDraft: false,
         thinkingGenerateReaction: false,
         selectedTeam: '',
-        createDraftResult: {},
-        blurbs: {},
-        grades: {}
+        createDraftResult: {}
       }
     );
   },
@@ -50,42 +51,17 @@ var MLBReaction = React.createClass({
   },
 
   handleGenerate: function(e) {
-    console.log("setting thinking to true");
    AppActions.setCreateDraftResult({})
-   AppActionCreator.getMlbReactionHtml(this.state.selectedTeam, this.state.blurbs, this.state.grades, this.state.extra);     
+   AppActionCreator.getMlbReactionHtml(this.state.selectedTeam, this.state.evaluation);     
    this.state.thinkingGenerateReaction = true;
    this.setState(this.state);
     jQuery("body").scrollTop(0);
   },
   handleTextChange: function(e) {
-      for (var i = 0; i< this.state.player_records.length; i++) {
-        if (e.target.id == this.state.player_records[i].id) {
-          this.state.blurbs[e.target.id] = e.target.value
-          return;
-        }
-      }
-      for (var i = 0; i< this.state.pitching_records.length; i++) {
-        if (e.target.id == this.state.pitching_records[i].id) {
-          this.state.blurbs[e.target.id] = e.target.value
-          return;
-        }
-      }
-      this.state.extra[e.target.id] = e.target.value;
+      this.state.evaluation.blurbs[e.target.id + ''] = e.target.value;
   },
   handleGradeChange: function(e) {
-      for (var i = 0; i< this.state.player_records.length; i++) {
-        if (e.target.id == this.state.player_records[i].id) {
-          this.state.grades[e.target.id] = e.target.value
-          break;
-        }
-      }
-      for (var i = 0; i< this.state.pitching_records.length; i++) {
-        if (e.target.id == this.state.pitching_records[i].id) {
-          this.state.grades[e.target.id] = e.target.value
-          break;
-        }
-      }
-      this.state.extra[e.target.id] = e.target.value;      
+      this.state.evaluation.grades[e.target.id + ''] = e.target.value;
   },
   createDraft: function() {
     this.state.thinkingCreatingDraft = true;
@@ -93,7 +69,6 @@ var MLBReaction = React.createClass({
     AppActionCreator.createMlbDraft(this.state);
   },
   _onChange: function() {
-    console.log("reset thinking to false");
     var box = AppStore.getPlayers();
     var html = AppStore.getMlbReactionHtml().html;
     var createDraftResult = AppStore.getCreateDraftResult();
@@ -114,7 +89,6 @@ var MLBReaction = React.createClass({
 
 
   render: function() { 
-    console.log("in render with thinking...", this.state.thinking);
     if (this.state.thinking) {
       return (
           <div>Hold up, doing stuff...</div>

@@ -21,12 +21,10 @@ var AppActionCreator = {
       });
 
   },
-  getMlbReactionHtml: function(teamId, blurbs, grades, extra) {
+  getMlbReactionHtml: function(teamId, evaluation) {
       var data = {
         team_id: teamId,
-        blurbs: blurbs,
-        grades: grades,
-        extra: extra
+        evaluation: evaluation
       }
       console.log("making request with ", data)
       jQuery.ajax({
