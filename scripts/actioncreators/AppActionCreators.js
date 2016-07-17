@@ -21,7 +21,14 @@ var AppActionCreator = {
       });
 
   },
-  getMlbReactionHtml: function(data) {
+  getMlbReactionHtml: function(teamId, blurbs, grades, extra) {
+      var data = {
+        team_id: teamId,
+        blurbs: blurbs,
+        grades: grades,
+        extra: extra
+      }
+      console.log("making request with ", data)
       jQuery.ajax({
           url: "/mlb/generate-reaction",
           type: "POST",

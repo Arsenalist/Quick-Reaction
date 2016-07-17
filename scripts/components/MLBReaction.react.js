@@ -21,8 +21,11 @@ var MLBReaction = React.createClass({
         extra: {},
         thinking: false,
         thinkingCreatingDraft: false,
+        thinkingGenerateReaction: false,
         selectedTeam: '',
-        createDraftResult: {}
+        createDraftResult: {},
+        blurbs: {},
+        grades: {}
       }
     );
   },
@@ -47,20 +50,23 @@ var MLBReaction = React.createClass({
   },
 
   handleGenerate: function(e) {
+    console.log("setting thinking to true");
    AppActions.setCreateDraftResult({})
-   AppActionCreator.getMlbReactionHtml(this.state);     
+   AppActionCreator.getMlbReactionHtml(this.state.selectedTeam, this.state.blurbs, this.state.grades, this.state.extra);     
+   this.state.thinkingGenerateReaction = true;
+   this.setState(this.state);
     jQuery("body").scrollTop(0);
   },
   handleTextChange: function(e) {
       for (var i = 0; i< this.state.player_records.length; i++) {
         if (e.target.id == this.state.player_records[i].id) {
-          this.state.player_records[i].blurb = e.target.value;
+          this.state.blurbs[e.target.id] = e.target.value
           return;
         }
       }
       for (var i = 0; i< this.state.pitching_records.length; i++) {
         if (e.target.id == this.state.pitching_records[i].id) {
-          this.state.pitching_records[i].blurb = e.target.value;
+          this.state.blurbs[e.target.id] = e.target.value
           return;
         }
       }
@@ -69,13 +75,13 @@ var MLBReaction = React.createClass({
   handleGradeChange: function(e) {
       for (var i = 0; i< this.state.player_records.length; i++) {
         if (e.target.id == this.state.player_records[i].id) {
-          this.state.player_records[i].grade = e.target.value;
+          this.state.grades[e.target.id] = e.target.value
           break;
         }
       }
       for (var i = 0; i< this.state.pitching_records.length; i++) {
         if (e.target.id == this.state.pitching_records[i].id) {
-          this.state.pitching_records[i].grade = e.target.value;
+          this.state.grades[e.target.id] = e.target.value
           break;
         }
       }
@@ -87,6 +93,7 @@ var MLBReaction = React.createClass({
     AppActionCreator.createMlbDraft(this.state);
   },
   _onChange: function() {
+    console.log("reset thinking to false");
     var box = AppStore.getPlayers();
     var html = AppStore.getMlbReactionHtml().html;
     var createDraftResult = AppStore.getCreateDraftResult();
@@ -98,6 +105,7 @@ var MLBReaction = React.createClass({
           manager: box.manager,
           thinking: false,
           thinkingCreatingDraft: false,
+          thinkingGenerateReaction: false,
           html: html,
           createDraftResult: createDraftResult
         }
@@ -106,6 +114,7 @@ var MLBReaction = React.createClass({
 
 
   render: function() { 
+    console.log("in render with thinking...", this.state.thinking);
     if (this.state.thinking) {
       return (
           <div>Hold up, doing stuff...</div>
@@ -113,7 +122,7 @@ var MLBReaction = React.createClass({
     } 
     var generateButton = null, createDraftButton = null;  
     if (typeof this.state.player_records != 'undefined' && this.state.player_records.length != 0) {
-      generateButton = <p><input type="button" onClick={this.handleGenerate} className="btn-lg btn-primary btn" value="Generate"/></p>;
+      generateButton = <p><input type="button"  style={{margin: 10 + 'px'}}  onClick={this.handleGenerate} className="btn-lg btn-primary btn btn-block" value="Generate"/></p>;
     } else {
       generateButton = null;
     }
@@ -124,26 +133,30 @@ var MLBReaction = React.createClass({
     if (this.state.createDraftResult.status == 'OK') {
       draftLink = <a href={this.state.createDraftResult.url} target="_blank">Draft created - click here to view</a>
     }
+    var rightSide = null;
+    if (this.state.thinkingGenerateReaction) {
+      rightSide = <div>Generating reaction...</div>
+    } else {
+      rightSide = <div><div dangerouslySetInnerHTML={{__html: typeof this.state.html == 'undefined' ? '' : '<textarea onclick="this.select()" style="width:100%">' + this.state.html + '</textarea>'}} />{createDraftButton} {draftLink}<div dangerouslySetInnerHTML={{__html: this.state.html}} /></div>
+    }
 
 
     return (
       <div className="row">      
         <div className="col-xs-6">          
             <TeamSelector selectedTeam={this.state.selectedTeam} handleSelectTeam={this.handleSelectTeam}/>
+            {generateButton}
             <PlayerList 
                 handleTextChange={this.handleTextChange} 
                 handleGradeChange={this.handleGradeChange} 
-                manager={this.state.manager} 
+                manager={this.state.manager}                 
                 pitchingRecords={this.state.pitching_records} 
                 playerRecords={this.state.player_records}/>
             {generateButton}
                 
         </div>
         <div className="col-xs-6">
-            <div dangerouslySetInnerHTML={{__html: typeof this.state.html == 'undefined' ? '' : '<textarea onclick="this.select()" style="width:100%">' + this.state.html + '</textarea>'}} />
-            {createDraftButton}  
-            {draftLink}          
-            <div dangerouslySetInnerHTML={{__html: this.state.html}} />
+            {rightSide}
         </div>
 
       </div>

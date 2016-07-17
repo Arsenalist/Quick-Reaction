@@ -69,6 +69,38 @@ class MLB:
   def get_teams(self):
     return get("/mlb/teams/")
 
+  def get_starter(self, pitching_records):
+    for p in pitching_records:
+      if p['sequence'] == 1:
+        return p
+    raise Exception("No starter found.")
+
+  def get_bullpen(self, pitching_records):
+    bullpen = []
+    for p in pitching_records:
+      if p['sequence'] != 1:
+        bullpen.append(p)
+    return bullpen
+
+
+  def get_player_with_most_bases(self, player_records):
+      totals = [0] * len(player_records)
+      i = 0
+      for p in player_records:
+        totals[i] = p['home_runs'] + p['runs_batted_in'] + p['runs'] + p['walks']
+        i = i + 1
+
+      biggestValue = 0
+      biggestIndex = 0
+      i = 0 
+      for t in totals:
+        if t > biggestValue:
+          biggestIndex = i
+          biggestValue = t
+        i = i + 1    
+
+      return player_records[biggestIndex]
+
   def get_managers(self):
     r = requests.get("http://espn.go.com/mlb/managers")
     soup = BeautifulSoup(r.text, "html.parser")
@@ -138,17 +170,7 @@ class MLB:
 from flask import render_template
 
 
-
-
-
-@app.route("/mlb/teams")
-def get_teams():
-    mlb = MLB()
-    return jsonify(mlb.get_teams())
-
-@app.route("/mlb/box/<id>")
-def get_box(id):
-  team_id = int(id)
+def get_aligned_box_score(team_id):
   mlb = MLB()
   box = mlb.get_latest_box_score(team_id)
   alignment = box.get_alignment(team_id)
@@ -175,8 +197,18 @@ def get_box(id):
     "player_records": relevant_player_records,
     "manager": manager.__dict__
   }
+  return context
 
 
+
+@app.route("/mlb/teams")
+def get_teams():
+    mlb = MLB()
+    return jsonify(mlb.get_teams())
+
+@app.route("/mlb/box/<id>")
+def get_box(id):
+  context = get_aligned_box_score(int(id))
   return jsonify(context)
 
 def read_file(file_name):
@@ -213,90 +245,77 @@ def create_draft():
   post = create_wordpress_draft(title, data.html, tags)
   return jsonify({"status": "OK", "url": "http://www.bluejaysrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
 
+def apply_payload_to_data(payload, data):
+  for p in data['pitching_records']:
+    p['blurb'] = payload['blurbs'][str(p['id'])] if str(p['id']) in payload['blurbs'] else None
+    p['grade'] = payload['grades'][str(p['id'])] if str(p['id']) in payload['grades'] else None
+
+  for p in data['player_records']:
+    p['blurb'] = payload['blurbs'][p['id']] if p['id'] in payload['blurbs'] else None
+    p['grade'] = payload['grades'][p['id']] if p['id'] in payload['grades'] else None
+
+  return data
 
 @app.route("/mlb/generate-reaction", methods=['POST'])
 def generate_reaction():
-  data = json.loads(request.form["data"])
+  payload = json.loads(request.form["data"])
+  data = get_aligned_box_score(int(payload['team_id']))
+  mlb = MLB()
   battingSummaryHtml = None
   bullpenSummaryHtml = None
   managerHtml = None
   startingPitcherHtml = None
+
+
+  data = apply_payload_to_data(payload, data)
+
+  starter = mlb.get_starter(data['pitching_records'])
+  bullpen =  mlb.get_bullpen(data['pitching_records'])
+
   
-  if 'battingSummaryBlurb' in data['extra']:
-
-      totals = [0] * len(data['player_records'])
-      i = 0
-      for p in data['player_records']:
-        totals[i] = p['home_runs'] + p['runs_batted_in'] + p['runs'] + p['walks']
-        i = i + 1
-
-      biggestValue = 0
-      biggestIndex = 0
-      i = 0 
-      for t in totals:
-        if t > biggestValue:
-          biggestIndex = i
-          biggestValue = t
-        i = i + 1
-
+  if 'battingSummaryBlurb' in payload['extra']:
+      most_bases = mlb.get_player_with_most_bases(data['player_records'])
       battingSummaryHtml = render_template('mlb-hitter-summary.html', data=data['player_records'], 
-        blurb=data['extra']['battingSummaryBlurb'], gradeImage=data['extra']['battingSummaryGrade'] if 'battingSummaryGrade' in data['extra'] else 'NA', 
-        personImage=data['player_records'][biggestIndex]['player']['headshots']['w192xh192'])
+        blurb=payload['extra']['battingSummaryBlurb'], gradeImage=payload['extra']['battingSummaryGrade'] if 'battingSummaryGrade' in payload['extra'] else 'NA', 
+        personImage=most_bases['player']['headshots']['w192xh192'])
 
-
-  starter = None
-  bullpen = []
-  for p in data['pitching_records']:
-    if p['sequence'] == 1:
-      starter = p
-    else:
-      bullpen.append(p)
-
-
-  if bullpen and 'bullpenSummaryBlurb' in data['extra']:
+  if bullpen and 'bullpenSummaryBlurb' in payload['extra']:
       bullpenSummaryHtml = render_template('mlb-pitching-summary.html', data=bullpen, 
-        blurb=data['extra']['bullpenSummaryBlurb'], gradeImage=data['extra']['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in data['extra'] else 'NA', 
+        blurb=payload['extra']['bullpenSummaryBlurb'], gradeImage=payload['extra']['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in payload['extra'] else 'NA', 
         personImage=bullpen[0]['player']['headshots']['w192xh192'])
 
-
-
-  if starter != None:
+  if ('blurb' in starter and starter['blurb'] != None):
     stats = render_template('mlb-pitcher-stats.html', data=starter)
-    if ('blurb' in starter and starter['blurb'] != ''):
-      startingPitcherHtml = render_template('evaluation.html', stats=stats, blurb=starter['blurb'], gradeImage=starter['grade'] if'grade' in starter else 'NA',
-        personName=starter['player']['first_initial_and_last_name'], personImage=starter['player']['headshots']['w192xh192'])
-
+    startingPitcherHtml = render_template('evaluation.html', stats=stats, blurb=starter['blurb'], gradeImage=starter['grade'] if'grade' in starter else 'NA',
+      personName=starter['player']['first_initial_and_last_name'], personImage=starter['player']['headshots']['w192xh192'])
 
   pitchers = []
   for p in bullpen:
-    if p['sequence'] != 1:
-      stats = render_template('mlb-pitcher-stats.html', data=p)
-      if ('blurb' in p and p['blurb'] != ''):
-        evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if'grade' in p else 'NA',
-          personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
-        pitchers.append(evaluation)
-
+    stats = render_template('mlb-pitcher-stats.html', data=p)
+    if ('blurb' in p and p['blurb'] != None):
+      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if'grade' in p else 'NA',
+        personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
+      pitchers.append(evaluation)
 
   hitters = []  
   for p in data['player_records']:
     stats = render_template('mlb-hitter-stats.html', data=p)
-    if ('blurb' in p and p['blurb'] != ''):
+    if ('blurb' in p and p['blurb'] != None):
       evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if'grade' in p else 'NA', 
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       hitters.append(evaluation)
 
-
   managerHtml = ''
-  if 'managerBlurb' in data['extra']:
+  if 'managerBlurb' in payload['extra']:
     manager = data['manager']
-    managerHtml = render_template('evaluation.html', stats='', blurb=data['extra']['managerBlurb'], gradeImage=data['extra']['managerGrade'] if 'managerGrade' in data['extra'] else 'NA',
+    managerHtml = render_template('evaluation.html', stats='', blurb=payload['extra']['managerBlurb'], gradeImage=payload['extra']['managerGrade'] if 'managerGrade' in payload['extra'] else 'NA',
       personName=manager['name'], personImage=manager['image'])
 
 
   freeForm = []
   for x in range(0, 5):
-    if 'freeForm' + str(x) in data['extra']:
-      freeForm.append(data['extra']['freeForm' + str(x)])
+    if 'freeForm' + str(x) in payload['extra']:
+      freeForm.append(payload['extra']['freeForm' + str(x)])
 
   html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml,
    battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml, freeForm=freeForm, overview=data["overview"])
