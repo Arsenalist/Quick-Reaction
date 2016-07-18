@@ -75,13 +75,13 @@
 <div class="section-header">The Starter</div>
     {{startingPitcherHtml|safe}}
 {% endif %}
-{% if bullpenSummaryHtml %}
-<div class="section-header">The Bullpen</div>
-    {{bullpenSummaryHtml|safe}}
-{% endif %}
 {% if battingSummaryHtml %}
     <div class="section-header">The Hitting</div>
     {{battingSummaryHtml|safe}}
+{% endif %}
+{% if bullpenSummaryHtml %}
+<div class="section-header">The Bullpen</div>
+    {{bullpenSummaryHtml|safe}}
 {% endif %}
 {% if managerHtml %}
   <div class="section-header">The Manager</div>

@@ -48,13 +48,13 @@ var PlayerList = React.createClass({
       <div className="playerList well">
         <Pitcher handleTextChange={that.props.handleTextChange} handleGradeChange={that.props.handleGradeChange}  data={startingPitcher}/>
       </div>
-      <h3>Bullpen Summary</h3>
-      <div className="bullpenSummary well">
-        <BullpenSummary handleTextChange={this.props.handleTextChange} handleGradeChange={this.props.handleGradeChange} data={bullpenPitchers}/>
-      </div>
       <h3>Batting Summary</h3>
       <div className="battingSummary well">
         <BattingSummary handleTextChange={this.props.handleTextChange} handleGradeChange={this.props.handleGradeChange} data={this.props.playerRecords}/>
+      </div>
+      <h3>Bullpen Summary</h3>
+      <div className="bullpenSummary well">
+        <BullpenSummary handleTextChange={this.props.handleTextChange} handleGradeChange={this.props.handleGradeChange} data={bullpenPitchers}/>
       </div>
       <h3>Manager</h3>
       <div className="playerList well">
