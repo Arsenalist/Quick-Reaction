@@ -4,6 +4,7 @@ var AppActionCreator = require('../actioncreators/AppActionCreators.js');
 var TeamSelector = require('./TeamSelector.react.js');
 var PlayerList = require('./PlayerList.react.js');
 var ReactionPreview = require('./ReactionPreview.react.js');
+var SoccerReactionForm = require('./SoccerReactionForm.react.js');
 var EvaluationRecorderMixin = require('../mixins/EvaluationRecorderMixin.react.js');
 
 var jQuery = require('jquery/dist/jquery');
@@ -43,33 +44,32 @@ var MLSReaction = React.createClass({
   },
 
 
-  handleSelectTeam: function(e) {    
+  handleSelectTeam: function(e) {  
     e.preventDefault();
     if (e.target.value == '') return false;
     this.state.thinkingTeamSelect = true;
     this.state.selectedTeam = e.target.value;
     this.setState(this.state);
-    AppActionCreator.getPlayers(e.target.value);
+    AppActionCreator.getMlsBox(e.target.value);
 
   },
 
   handleGenerate: function(e) {
    AppActions.setCreateDraftResult({}) // TODO: Fix this magic
-   AppActionCreator.getMlbReactionHtml(this.state.selectedTeam, this.state.evaluation);     
+   AppActionCreator.getMlsReactionHtml(this.state.selectedTeam, this.state.evaluation);     
    this.state.thinkingGenerateReaction = true;
    this.setState(this.state);
     jQuery("body").scrollTop(0);
   },
 
   _onChange: function() {
-    var box = AppStore.getPlayers();
-    var html = AppStore.getMlbReactionHtml().html;
+    var box = AppStore.getMlsBox();
+    var html = AppStore.getMlsReactionHtml().html;
     this.setState(
         {
           overview: box.overview,
           player_records: box.player_records,
-          pitching_records: box.pitching_records,
-          manager: box.manager,
+          goalie_records: box.goalie_records,
           thinkingTeamSelect: false,
           thinkingGenerateReaction: false,
           html: html
@@ -102,13 +102,11 @@ var MLSReaction = React.createClass({
       <h1>Soccer Reaction</h1>
       <div className="row">      
         <div className="col-xs-6">          
-            <TeamSelector selectedTeam={this.state.selectedTeam} handleSelectTeam={this.handleSelectTeam}/>
+            <TeamSelector league="mls" selectedTeam={this.state.selectedTeam} handleSelectTeam={this.handleSelectTeam}/>
             {generateButton}
-            <PlayerList 
+            <SoccerReactionForm 
                 handleTextChange={this.handleTextChange} 
                 handleGradeChange={this.handleGradeChange} 
-                manager={this.state.manager}                 
-                pitchingRecords={this.state.pitching_records} 
                 playerRecords={this.state.player_records}/>
             {generateButton}
                 

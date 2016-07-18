@@ -102,7 +102,7 @@ var MLBReaction = React.createClass({
       <h1>Baseball Reaction</h1>
       <div className="row">            
         <div className="col-xs-6">          
-            <TeamSelector selectedTeam={this.state.selectedTeam} handleSelectTeam={this.handleSelectTeam}/>
+            <TeamSelector league="mlb" selectedTeam={this.state.selectedTeam} handleSelectTeam={this.handleSelectTeam}/>
             {generateButton}
             <PlayerList 
                 handleTextChange={this.handleTextChange} 

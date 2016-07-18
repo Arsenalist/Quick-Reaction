@@ -10,11 +10,19 @@ var AppActionCreator = {
         AppActions.setPlayers(data);
      });
   },
-  getTeams: function() {
+  getMlsBox: function(teamId) {
+    console.log("in mls box ", teamId);
+    jQuery.get( "/mls/box/" + teamId, function( data ) {
+        console.log("result of call mls box");
+        AppActions.setMlsBox(data);
+     });
+  },
+  getTeams: function(league) {
       jQuery.ajax({
-          url: "/mlb/teams",
-          type: "GET",
+          url: "/teams",
+          type: "POST",
           dataType: "json",
+          data: {league: league},
           success: function (data) {
               AppActions.setTeams(data);
           }
@@ -26,7 +34,6 @@ var AppActionCreator = {
         team_id: teamId,
         evaluation: evaluation
       }
-      console.log("making request with ", data)
       jQuery.ajax({
           url: "/mlb/generate-reaction",
           type: "POST",
@@ -34,6 +41,21 @@ var AppActionCreator = {
           data: {data: JSON.stringify(data)},
           success: function (data) {
               AppActions.setMlbReactionHtml(data);              
+          }
+      });
+  },
+  getMlsReactionHtml: function(teamId, evaluation) {
+      var data = {
+        team_id: teamId,
+        evaluation: evaluation
+      }
+      jQuery.ajax({
+          url: "/mls/generate-reaction",
+          type: "POST",
+          dataType: "json",
+          data: {data: JSON.stringify(data)},
+          success: function (data) {
+              AppActions.setMlsReactionHtml(data);              
           }
       });
   },

@@ -229,10 +229,15 @@ def get_aligned_box_score(team_id):
 
 
 
-@app.route("/mlb/teams")
+@app.route("/teams", methods=['POST'])
 def get_teams():
-    mlb = MLB()
-    return jsonify(mlb.get_teams())
+    league = request.form["league"]
+    if league == 'mlb':
+      mlb = MLB()
+      return jsonify(mlb.get_teams())
+    elif league == 'mls':
+      mls = MLS()
+      return jsonify(mls.get_teams())
 
 
 @app.route("/mls/box/<id>")

@@ -12,15 +12,23 @@ var _formation = null;
 var _message = null;
 var _location = null
 var _mlbReactionHtml = {};
+var _mlsReactionHtml = {};
 var _createDraftResult = {};
+var _mlsBox = {};
 
 var AppStore = assign({}, EventEmitter.prototype, {
 
   getPlayers: function() {
   	return _players;
   },
+  getMlsBox: function() {
+    return _mlsBox;
+  },
   getMlbReactionHtml: function() {
     return _mlbReactionHtml;
+  },
+  getMlsReactionHtml: function() {
+    return _mlsReactionHtml;
   },
   getTeams: function() {
     return _teams;
@@ -63,8 +71,15 @@ AppDispatcher.register(function(action) {
        _mlbReactionHtml = action.mlbReactionHtml;
       AppStore.emitChange();
          break;
+    case AppConstants.RECEIVE_MLS_REACTION_HTML:
+       _mlsReactionHtml = action.mlsReactionHtml;
+      AppStore.emitChange();
+         break;
     case AppConstants.SET_CREATE_DRAFT_RESULT:
       _createDraftResult = action.result;
+      AppStore.emitChange();
+    case AppConstants.RECEIVE_MLS_BOX:
+      _mlsBox = action.box;
       AppStore.emitChange();
     default:
       // no op
