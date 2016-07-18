@@ -353,7 +353,9 @@ def generate_reaction():
       freeForm.append(blurbs['freeForm' + str(x)])
 
   html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml,
-   battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml, freeForm=freeForm, overview=data["overview"])
+   battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml, 
+   freeForm=freeForm, overview=data["overview"], 
+   unevenInnings=len(data["overview"]['line_scores']['home']) != len(data["overview"]['line_scores']['away']))
 
   return jsonify({"html": html});
 

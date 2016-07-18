@@ -12,7 +12,7 @@ var jQuery = require('jquery/dist/jquery');
 var React = require('react');
 
 
-var MLBReaction = React.createClass({
+var MLSReaction = React.createClass({
 
   mixins: [EvaluationRecorderMixin],
 
@@ -21,7 +21,7 @@ var MLBReaction = React.createClass({
       {
         overview: {},
         player_records: [],
-        pitching_records: [],
+        goalie_records: [],
         evaluation: {
           blurbs: {},
           grades: {}
@@ -97,10 +97,10 @@ var MLBReaction = React.createClass({
       rightSide = <ReactionPreview type="mlb-reaction" context={this.state.overview} html={this.state.html} />
     }
 
-    return (      
+    return (
       <div>
-      <h1>Baseball Reaction</h1>
-      <div className="row">            
+      <h1>Soccer Reaction</h1>
+      <div className="row">      
         <div className="col-xs-6">          
             <TeamSelector selectedTeam={this.state.selectedTeam} handleSelectTeam={this.handleSelectTeam}/>
             {generateButton}
@@ -122,4 +122,4 @@ var MLBReaction = React.createClass({
   }
 });
 
-module.exports = MLBReaction;
+module.exports = MLSReaction;
