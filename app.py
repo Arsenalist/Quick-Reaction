@@ -316,24 +316,24 @@ def generate_reaction():
   if 'battingSummaryBlurb' in blurbs:
       most_bases = mlb.get_player_with_most_bases(data['player_records'])
       battingSummaryHtml = render_template('mlb-hitter-summary.html', data=data['player_records'], 
-        blurb=blurbs['battingSummaryBlurb'], gradeImage=grades['battingSummaryGrade'] if 'battingSummaryGrade' in grades else 'NA', 
+        blurb=blurbs['battingSummaryBlurb'], gradeImage=grades['battingSummaryGrade'] if 'battingSummaryGrade' in grades else None, 
         personImage=most_bases['player']['headshots']['w192xh192'])
 
   if bullpen and 'bullpenSummaryBlurb' in blurbs:
       bullpenSummaryHtml = render_template('mlb-pitching-summary.html', data=bullpen, 
-        blurb=blurbs['bullpenSummaryBlurb'], gradeImage=grades['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in grades else 'NA', 
+        blurb=blurbs['bullpenSummaryBlurb'], gradeImage=grades['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in grades else None, 
         personImage=bullpen[0]['player']['headshots']['w192xh192'])
 
   if ('blurb' in starter and starter['blurb'] != None):
     stats = render_template('mlb-pitcher-stats.html', data=starter)
-    startingPitcherHtml = render_template('evaluation.html', stats=stats, blurb=starter['blurb'], gradeImage=starter['grade'] if'grade' in starter else 'NA',
+    startingPitcherHtml = render_template('evaluation.html', stats=stats, blurb=starter['blurb'], gradeImage=starter['grade'] if'grade' in starter else None,
       personName=starter['player']['first_initial_and_last_name'], personImage=starter['player']['headshots']['w192xh192'])
 
   pitchers = []
   for p in bullpen:
     stats = render_template('mlb-pitcher-stats.html', data=p)
     if ('blurb' in p and p['blurb'] != None):
-      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if'grade' in p else 'NA',
+      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if 'grade' in p else None,
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       pitchers.append(evaluation)
 
@@ -341,14 +341,14 @@ def generate_reaction():
   for p in data['player_records']:
     stats = render_template('mlb-hitter-stats.html', data=p)
     if ('blurb' in p and p['blurb'] != None):
-      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if'grade' in p else 'NA', 
+      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if 'grade' in p else None, 
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       hitters.append(evaluation)
 
   managerHtml = ''
   if 'managerBlurb' in blurbs:
     manager = data['manager']
-    managerHtml = render_template('evaluation.html', stats='', blurb=blurbs['managerBlurb'], gradeImage=grades['managerGrade'] if 'managerGrade' in grades else 'NA',
+    managerHtml = render_template('evaluation.html', stats='', blurb=blurbs['managerBlurb'], gradeImage=grades['managerGrade'] if 'managerGrade' in grades else None,
       personName=manager['name'], personImage=manager['image'])
 
 
