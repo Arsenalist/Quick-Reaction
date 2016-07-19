@@ -54,11 +54,11 @@ var MLSReaction = React.createClass({
   },
 
   handleGenerate: function(e) {
-   AppActions.setCreateDraftResult({}) // TODO: Fix this magic
+   //AppActions.setCreateDraftResult({}) // TODO: Fix this magic
    AppActionCreator.getMlsReactionHtml(this.state.selectedTeam, this.state.evaluation);     
    this.state.thinkingGenerateReaction = true;
    this.setState(this.state);
-    jQuery("body").scrollTop(0);
+   jQuery("body").scrollTop(0);
   },
 
   _onChange: function() {
@@ -93,7 +93,7 @@ var MLSReaction = React.createClass({
     if (this.state.thinkingGenerateReaction) {
       rightSide = <div>Generating reaction...</div>
     } else {
-      rightSide = <ReactionPreview type="mlb-reaction" context={this.state.overview} html={this.state.html} />
+      rightSide = <ReactionPreview type="mls-reaction" context={this.state.overview} html={this.state.html} />
     }
 
     return (
@@ -106,7 +106,8 @@ var MLSReaction = React.createClass({
             <SoccerReactionForm 
                 handleTextChange={this.handleTextChange} 
                 handleGradeChange={this.handleGradeChange} 
-                playerRecords={this.state.player_records}/>
+                playerRecords={this.state.player_records}
+                goalieRecords={this.state.goalie_records}/>
             {generateButton}
                 
         </div>

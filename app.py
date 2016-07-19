@@ -278,12 +278,20 @@ def create_wordpress_draft(title, html, tags):
   return post
 
 @app.route("/create-draft", methods=['POST'])
-def create_draft():
+def create_mlb_draft():
   data = DotMap(json.loads(request.form["data"]))
-  title = 'Quick Reaction: ' + data.context.event.home_team.full_name + ' ' + str(data.context.home_score_runs) + ', ' + data.context.event.away_team.full_name + ' ' + str(data.context.away_score_runs)
-  tags = [data.context.event.home_team.full_name, data.context.event.away_team.full_name]
-  post = create_wordpress_draft(title, data.html, tags)
-  return jsonify({"status": "OK", "url": "http://www.bluejaysrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
+  if data.type == 'mlb-reaction':
+    title = 'Quick Reaction: ' + data.context.event.away_team.full_name + ' ' + str(data.context.away_score_runs) + ', ' + data.context.event.home_team.full_name + ' ' + str(data.context.home_score_runs)
+    tags = [data.context.event.home_team.full_name, data.context.event.away_team.full_name]
+    post = create_wordpress_draft(title, data.html, tags)
+    return jsonify({"status": "OK", "url": "http://www.bluejaysrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
+
+  elif data.type == 'mls-reaction':
+    title = 'Quick Reaction: ' + data.context.event.home_team.full_name + ' ' + str(data.context.score.home.score) + ', ' + data.context.event.away_team.full_name + ' ' + str(data.context.score.away.score)
+    tags = [data.context.event.home_team.full_name, data.context.event.away_team.full_name]
+    post = create_wordpress_draft(title, data.html, tags)
+    return jsonify({"status": "OK", "url": "http://www.tfcrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
+
 
 def apply_evaluation(evaluation, records):
   for p in records:
@@ -310,7 +318,6 @@ def generate_reaction():
 
   starter = mlb.get_starter(data['pitching_records'])
   bullpen =  mlb.get_bullpen(data['pitching_records'])
-
 
   
   if 'battingSummaryBlurb' in blurbs:
@@ -363,6 +370,36 @@ def generate_reaction():
    unevenInnings=len(data["overview"]['line_scores']['home']) != len(data["overview"]['line_scores']['away']))
 
   return jsonify({"html": html});
+
+
+@app.route("/mls/generate-reaction", methods=['POST'])
+def generate_mls_reaction():
+  payload = json.loads(request.form["data"])
+  evaluation = payload['evaluation']
+  blurbs = evaluation['blurbs']
+  grades = evaluation['grades']
+
+  data = get_aligned_mls_box_score(int(payload['team_id']))
+  mls = MLS()
+  
+  data['player_records'] = apply_evaluation(evaluation, data['player_records'])
+  data['goalie_records'] = apply_evaluation(evaluation, data['goalie_records'])
+  for d in data['goalie_records']:
+    p = DotMap(d)
+    d['stats'] = "{0} MP | {1} ({2}) SA (OG) | {3} GA | {4}/{5} R/Y | {6} FC | {7} FS".format(p.minutes_played, p.shots_against, p.shots_on_goal_against, p.goals_against, p.yellow_cards, p.red_cards, p.fouls_committed, p.fouls_suffered)
+  for d in data['player_records']:
+    p = DotMap(d)
+    d['stats'] = "{0} | {1} MP | {2} G | {3} A | {4} ({5}) S | {6} CK | {7} C | {8}/{9} R/Y | {10} FC | {11} FS".format(p.position, p.minutes_played, p.goals, p.assists, p.shots, p.shots_on_goal, p.corner_kicks, p.crosses, p.yellow_cards, p.red_cards, p.fouls_committed, p.fouls_suffered)
+
+  freeForm = []
+  for x in range(0, 5):
+    if 'freeForm' + str(x) in blurbs:
+      freeForm.append(blurbs['freeForm' + str(x)])
+
+  html = render_template('mls-reaction.html', data=data, freeForm=freeForm)
+
+  return jsonify({"html": html});
+
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.

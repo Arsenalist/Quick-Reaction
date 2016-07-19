@@ -16,7 +16,7 @@ var Participant = React.createClass({
          </div>
          <div className="col-xs-8">
             <textarea id={data.id} onChange={this.props.handleTextChange} className="form-control" style={{height: '150px'}}></textarea>
-            {this.props.metaRenderer}            
+            {this.props.metaRenderer(data)}            
          </div>
          <div className="col-xs-2">
             <Grade id={data.id} handleGradeChange={this.props.handleGradeChange} />

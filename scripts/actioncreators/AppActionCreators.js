@@ -13,7 +13,7 @@ var AppActionCreator = {
   getMlsBox: function(teamId) {
     console.log("in mls box ", teamId);
     jQuery.get( "/mls/box/" + teamId, function( data ) {
-        console.log("result of call mls box");
+        console.log("result of call mls box ", data);
         AppActions.setMlsBox(data);
      });
   },

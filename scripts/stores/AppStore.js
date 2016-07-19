@@ -79,6 +79,10 @@ AppDispatcher.register(function(action) {
       _createDraftResult = action.result;
       AppStore.emitChange();
     case AppConstants.RECEIVE_MLS_BOX:
+      console.log("MLS box is updated in store");
+      var stack = new Error().stack;
+  console.log("PRINTING CALL STACK");
+  console.log( stack );
       _mlsBox = action.box;
       AppStore.emitChange();
     default:

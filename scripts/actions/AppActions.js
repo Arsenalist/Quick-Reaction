@@ -13,6 +13,7 @@ var AppActions = {
     });
   },
   setMlsBox: function(box) {
+    console.log("setMLS Box action called in AppActions");
     AppDispatcher.dispatch({
       actionType: AppConstants.RECEIVE_MLS_BOX,
       box: box

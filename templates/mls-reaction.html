@@ -1,0 +1,83 @@
+<style>.mlb-reaction .section-header {background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em} .mlb-reaction .grade {background: #315233; border: 6px solid #977252; color: white; font-size:35px; font-weight: bold; text-align: center; width: 100%; margin-top: 10px} .free-form-number { border: 3px solid #808080; color: #808080; font-size:35px; font-weight: bold; text-align: center; height: 50px; width: 50px;}</style>
+
+{% macro evaluation(personName, personImage, grade, stats, blurb) -%}
+<div class="row" style="margin-bottom: 10px">
+  <div class="col-xs-12 col-md-2"><img style="margin: auto" class="img-responsive" src="{{personImage}}">{% if grade %} <div class="grade">{{grade}}</div> {% endif %}</div>
+  <div class="col-xs-12 col-md-10">
+    <h4>{{personName}}</h4>
+    <strong>{{stats}}</strong><p>{{blurb|safe}}</p>
+  </div>
+</div>
+{%- endmacro %}
+
+<div class="container-fluid mlb-reaction">
+
+<div class="row">
+  <div class="col-xs-6 col-md-offset-3 col-md-2 text-right">
+    <img src="{{data.overview.event.home_team.logos.w72xh72}}"/>    
+  </div>
+  <div class="col-xs-5 col-md-2">
+    <div class="row">
+      <h3>{{data.overview.event.home_team.medium_name}}</h3>
+    </div>
+  </div>
+  <div class="col-xs-1 col-md-5">
+    <h3><strong>{{data.overview.score.home.score}}</strong></h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-6 col-md-offset-3 col-md-2 text-right">
+    <img src="{{data.overview.event.away_team.logos.w72xh72}}"/>    
+  </div>
+  <div class="col-xs-5  col-md-2">
+    <div class="row">
+      <h3>{{data.overview.event.away_team.medium_name}}</h3>
+    </div>
+  </div>
+  <div class="col-xs-1 col-md-5">
+    <h3><strong>{{data.overview.score.away.score}}</strong></h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-12">
+        <div class="table-responsive">
+    <table class="table table-condensed table-bordered">
+    </table></div>
+  </div>
+</div>
+
+{% if data.player_records %}
+<div class="section-header">Outfield</div>
+    {% for p in data.player_records %}
+    {% if p.blurb %}
+      {{ evaluation(p.player.first_initial_and_last_name, p.player.headshots.w192xh192, p.grade, p.stats, p.blurb) }}
+    {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if data.goalie_records %}
+<div class="section-header">Goalies</div>
+    {% for p in data.goalie_records %}
+    {% if p.blurb %}
+      {{ evaluation(p.player.first_initial_and_last_name, p.player.headshots.w192xh192, p.grade, p.stats, p.blurb) }}
+    {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+{% if freeForm %}
+  <div class="section-header">Extra Innings</div>
+  {% for f in freeForm %}
+    <div class="media" style="margin-bottom: 10px">
+      <div class="media-left media-top">
+          <div class="free-form-number">{{loop.index}}</div>
+      </div>
+      <div class="media-body">{{f|safe}}</div>
+    </div>
+  {% endfor %}   
+{% endif %}  
+
+</div>
+  
