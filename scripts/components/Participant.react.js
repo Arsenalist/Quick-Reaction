@@ -1,7 +1,7 @@
 var React = require('react');
 var Grade = require('./Grade.react.js');
 
-var SoccerOutfieldPlayer = React.createClass({
+var Participant = React.createClass({
   getInitialState: function() {
     return {player: this.props.data};
   },
@@ -16,10 +16,7 @@ var SoccerOutfieldPlayer = React.createClass({
          </div>
          <div className="col-xs-8">
             <textarea id={data.id} onChange={this.props.handleTextChange} className="form-control" style={{height: '150px'}}></textarea>
-            {data.position} | {data.minutes_played} MP | {data.goals} G | {data.assists} A |  {data.shots} ({data.shots_on_goal}) S |  
-            {data.corner_kicks} CK | {data.crosses} C |
-            {data.yellow_cards}/{data.red_cards} R/Y
-            {data.fouls_committed} FC | {data.fouls_suffered} FS 
+            {this.props.metaRenderer}            
          </div>
          <div className="col-xs-2">
             <Grade id={data.id} handleGradeChange={this.props.handleGradeChange} />
@@ -28,4 +25,4 @@ var SoccerOutfieldPlayer = React.createClass({
     );
   }
 });
-module.exports = SoccerOutfieldPlayer;
+module.exports = Participant;

@@ -42,7 +42,6 @@ var MLBReaction = React.createClass({
     AppStore.addChangeListener(this._onChange);
   },
 
-
   handleSelectTeam: function(e) {    
     e.preventDefault();
     if (e.target.value == '') return false;

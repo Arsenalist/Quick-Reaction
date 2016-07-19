@@ -1,5 +1,4 @@
-var Hitter = require('./Hitter.react.js');
-var Pitcher = require('./Pitcher.react.js');
+var Participant = require('./Participant.react.js');
 var BattingSummary = require('./BattingSummary.react.js');
 var BullpenSummary = require('./BullpenSummary.react.js');
 var Manager = require('./Manager.react.js');
@@ -9,6 +8,16 @@ var React = require('react');
 var _ = require('lodash');
 
 var PlayerList = React.createClass({
+
+  renderHitterStats: function(p) {
+    return <div>{p.hits}-{p.at_bats} | {p.walks} BB | {p.runs} R | {p.doubles} 2B | 
+            {p.triples} 3B | {p.home_runs} HR | {p.strike_outs} K | {p.stolen_bases} SB | AVG: {p.short_batting_average}, OBP: {p.on_base_percentage}, Slug: {p.slugging_percentage})</div>
+  },
+
+  renderPitcherStats: function(data) {
+    return <div>{data.innings_pitched} IP | {data.runs} ({data.earned_runs}) | {data.hits} H | {data.walks} BB | {data.strike_outs} K | {data.pitch_count} PC, B: {data.balls}, S: {data.strikes}
+            | {data.earned_run_average} ERA)</div>
+  },
 
   render: function() {
     if (typeof this.props.playerRecords == 'undefined' || this.props.playerRecords.length == 0) {
@@ -20,13 +29,13 @@ var PlayerList = React.createClass({
     var that = this;
     if (this.props.playerRecords != null) {
       hitters = this.props.playerRecords.map(function (player) {
-          return <Hitter handleTextChange={that.props.handleTextChange} handleGradeChange={that.props.handleGradeChange}  data={player}/>
+          return <Participant handleTextChange={that.props.handleTextChange} handleGradeChange={that.props.handleGradeChange} metaRenderer={that.renderHitterStats} data={player}/>
       });
     }
     if (this.props.pitchingRecords != null) {
       bullpenPitchers = _.filter(this.props.pitchingRecords, function (player) {return player['sequence'] != 1});
       bullpenPitchersElements = _.map(bullpenPitchers, function (player) {          
-          return <Pitcher handleTextChange={that.props.handleTextChange} handleGradeChange={that.props.handleGradeChange}  data={player}/>
+          return <Participant handleTextChange={that.props.handleTextChange} handleGradeChange={that.props.handleGradeChange} metaRenderer={that.renderPitcherStats} data={player}/>
       });
     }
     if (this.props.pitchingRecords != null) {
@@ -46,7 +55,7 @@ var PlayerList = React.createClass({
       <div className="blurbs">
       <h3>Starting Pitcher</h3>
       <div className="playerList well">
-        <Pitcher handleTextChange={that.props.handleTextChange} handleGradeChange={that.props.handleGradeChange}  data={startingPitcher}/>
+        <Participant handleTextChange={that.props.handleTextChange} handleGradeChange={that.props.handleGradeChange} metaRenderer={this.renderPitcherStats}  data={startingPitcher}/>
       </div>
       <h3>Batting Summary</h3>
       <div className="battingSummary well">

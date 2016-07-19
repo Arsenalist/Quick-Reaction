@@ -34,7 +34,6 @@ var MLSReaction = React.createClass({
       }
     );
   },
-
   componentWillUnmount: function() {
     AppStore.removeChangeListener(this._onChange);
   },
