@@ -13,6 +13,7 @@ var Grade = React.createClass({
     return (
       <div>
         <select id={this.props.id} className="form-control" onChange={this.props.handleGradeChange}>
+          <option>Select grade</option>
             {gradeOptions}
         </select>
       </div>

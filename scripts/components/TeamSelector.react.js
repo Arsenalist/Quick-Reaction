@@ -10,7 +10,6 @@ var TeamSelector = React.createClass({
 
 
   getInitialState: function() {
-    console.log("initial state called");
     return {
         teams: []
       };
@@ -21,9 +20,8 @@ var TeamSelector = React.createClass({
   },
 
   componentDidMount: function() {
-    console.log("component mounted");
     AppStore.addChangeListener(this._onChange);
-    AppActionCreator.getTeams();
+    AppActionCreator.getTeams(this.props.league);
   },
 
   _onChange: function() {

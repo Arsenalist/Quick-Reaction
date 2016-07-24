@@ -250,7 +250,7 @@ def get_mls_team_preview():
   mls = MLS()
   team_uri = "/mls/teams/" + str(team_id)
   next_game = mls.get_next_game(team_uri)
-  if next_game is None:
+  if next_game == None:
     raise Exception("No next game for " + str(team_id))
   other_team_id = mls.get_other_team_id(next_game, team_id)
 

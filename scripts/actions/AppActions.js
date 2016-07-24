@@ -12,6 +12,13 @@ var AppActions = {
       players: players
     });
   },
+  setMlsBox: function(box) {
+    console.log("setMLS Box action called in AppActions");
+    AppDispatcher.dispatch({
+      actionType: AppConstants.RECEIVE_MLS_BOX,
+      box: box
+    });
+  },
   setTeams: function(teams) {
     AppDispatcher.dispatch({
       actionType: AppConstants.RECEIVE_TEAMS,
@@ -23,7 +30,12 @@ var AppActions = {
       actionType: AppConstants.RECEIVE_MLB_REACTION_HTML,
       mlbReactionHtml: mlbReactionHtml
     });
-
+  },
+  setMlsReactionHtml: function(mlsReactionHtml) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.RECEIVE_MLS_REACTION_HTML,
+      mlsReactionHtml: mlsReactionHtml
+    });
   },
   setCurrentTeam: function(team) {
     AppDispatcher.dispatch({

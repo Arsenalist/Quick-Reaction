@@ -57,7 +57,10 @@
       <td>{{overview.event.home_team.medium_name}}</td>
       {% for seg in overview.line_scores.home %}
         <td>{% if seg.score is not none %} {{seg.score}} {% endif %}</td>
-      {% endfor %}    
+      {% endfor %}  
+      {% if unevenInnings %}
+        <td></td>
+      {% endif %}
       <td><strong>{{overview.home_score_runs}}</strong></td>
       <td><strong>{{overview.home_score_hits}}</strong></td>
       <td><strong>{{overview.home_score_errors}}</strong></td>
@@ -72,13 +75,13 @@
 <div class="section-header">The Starter</div>
     {{startingPitcherHtml|safe}}
 {% endif %}
-{% if bullpenSummaryHtml %}
-<div class="section-header">The Bullpen</div>
-    {{bullpenSummaryHtml|safe}}
-{% endif %}
 {% if battingSummaryHtml %}
     <div class="section-header">The Hitting</div>
     {{battingSummaryHtml|safe}}
+{% endif %}
+{% if bullpenSummaryHtml %}
+<div class="section-header">The Bullpen</div>
+    {{bullpenSummaryHtml|safe}}
 {% endif %}
 {% if managerHtml %}
   <div class="section-header">The Manager</div>

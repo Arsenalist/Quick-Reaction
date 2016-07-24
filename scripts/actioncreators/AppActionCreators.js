@@ -10,25 +10,30 @@ var AppActionCreator = {
         AppActions.setPlayers(data);
      });
   },
-  getTeams: function() {
+  getMlsBox: function(teamId) {
+    console.log("in mls box ", teamId);
+    jQuery.get( "/mls/box/" + teamId, function( data ) {
+        console.log("result of call mls box ", data);
+        AppActions.setMlsBox(data);
+     });
+  },
+  getTeams: function(league) {
       jQuery.ajax({
-          url: "/mlb/teams",
-          type: "GET",
+          url: "/teams",
+          type: "POST",
           dataType: "json",
+          data: {league: league},
           success: function (data) {
               AppActions.setTeams(data);
           }
       });
 
   },
-  getMlbReactionHtml: function(teamId, blurbs, grades, extra) {
+  getMlbReactionHtml: function(teamId, evaluation) {
       var data = {
         team_id: teamId,
-        blurbs: blurbs,
-        grades: grades,
-        extra: extra
+        evaluation: evaluation
       }
-      console.log("making request with ", data)
       jQuery.ajax({
           url: "/mlb/generate-reaction",
           type: "POST",
@@ -39,9 +44,24 @@ var AppActionCreator = {
           }
       });
   },
-  createMlbDraft: function(data) {
+  getMlsReactionHtml: function(teamId, evaluation) {
+      var data = {
+        team_id: teamId,
+        evaluation: evaluation
+      }
       jQuery.ajax({
-          url: "/mlb/create-draft",
+          url: "/mls/generate-reaction",
+          type: "POST",
+          dataType: "json",
+          data: {data: JSON.stringify(data)},
+          success: function (data) {
+              AppActions.setMlsReactionHtml(data);              
+          }
+      });
+  },
+  createDraft: function(data) {
+      jQuery.ajax({
+          url: "/create-draft",
           type: "POST",
           dataType: "json",
           data: {data: JSON.stringify(data)},

@@ -1,7 +1,7 @@
 var React = require('react');
 var Grade = require('./Grade.react.js');
 
-var Hitter = React.createClass({
+var Participant = React.createClass({
   getInitialState: function() {
     return {player: this.props.data};
   },
@@ -16,8 +16,7 @@ var Hitter = React.createClass({
          </div>
          <div className="col-xs-8">
             <textarea id={data.id} onChange={this.props.handleTextChange} className="form-control" style={{height: '150px'}}></textarea>
-            {data.hits}-{data.at_bats} | {data.walks} BB | {data.runs} R | {data.doubles} 2B | 
-            {data.triples} 3B | {data.home_runs} HR | {data.strike_outs} K | {data.stolen_bases} SB
+            {this.props.metaRenderer(data)}            
          </div>
          <div className="col-xs-2">
             <Grade id={data.id} handleGradeChange={this.props.handleGradeChange} />
@@ -26,4 +25,4 @@ var Hitter = React.createClass({
     );
   }
 });
-module.exports = Hitter;
+module.exports = Participant;
