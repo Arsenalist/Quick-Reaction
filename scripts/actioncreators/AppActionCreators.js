@@ -11,10 +11,13 @@ var AppActionCreator = {
      });
   },
   getMlsBox: function(teamId) {
-    console.log("in mls box ", teamId);
     jQuery.get( "/mls/box/" + teamId, function( data ) {
-        console.log("result of call mls box ", data);
         AppActions.setMlsBox(data);
+     });
+  },
+  getMlsPreview: function(teamId) {
+    jQuery.get( "/mls/preview/" + teamId, function( data ) {
+        AppActions.setMlsPreview(data);
      });
   },
   getTeams: function(league) {
@@ -41,6 +44,21 @@ var AppActionCreator = {
           data: {data: JSON.stringify(data)},
           success: function (data) {
               AppActions.setMlbReactionHtml(data);              
+          }
+      });
+  },
+  getMlsPreviewHtml: function(teamId, evaluation) {
+      var data = {
+        team_id: teamId,
+        evaluation: evaluation
+      }
+      jQuery.ajax({
+          url: "/mls/generate-preview",
+          type: "POST",
+          dataType: "json",
+          data: {data: JSON.stringify(data)},
+          success: function (data) {
+              AppActions.setMlsPreviewHtml(data);              
           }
       });
   },

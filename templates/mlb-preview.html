@@ -1,0 +1,91 @@
+<style>.mlb-reaction .section-header {background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em} .mlb-reaction .grade {background: #315233; border: 6px solid #977252; color: white; font-size:35px; font-weight: bold; text-align: center; width: 100%; margin-top: 10px} .free-form-number { border: 3px solid #808080; color: #808080; font-size:35px; font-weight: bold; text-align: center; height: 50px; width: 50px;}</style>
+    <div class="mlb-reaction">
+      <div class="section-header">The Matchup</div>
+      <div class="row">
+        <div class="col-xs-6 text-center">          
+          <img src="{{data.home_team.logos.small}}"/>
+          <h2>{{data.home_team.medium_name}}</h2>          
+          <strong>Record:</strong> {{data.home_team.standing.short_record}} <br/>
+          <strong>Last 5:</strong> {{data.home_team.standing.last_five_games_record}} <br/>
+          <strong>Rank:</strong> {{data.home_team.standing.formatted_rank}} <br/>
+          <h3>Recent Results</h3>
+          <ul>
+          {% for g in data.home_previous_games %}
+            <li class="list-unstyled">{{g.home_team.medium_name}} {{g.box_score.score.home.score }} , {{g.away_team.medium_name}} {{g.box_score.score.away.score}}</li>
+          {% endfor %}
+          </ul>
+        </div>
+
+        <div class="col-xs-6 text-center">
+          <img src="{{data.home_team.logos.small}}"/>
+          <h2>{{data.home_team.medium_name}}</h2>          
+          <strong>Record:</strong> {{data.home_team.standing.short_record}} <br/>
+          <strong>Last 5:</strong> {{data.home_team.standing.last_five_games_record}} <br/>
+          <strong>Rank:</strong> {{data.home_team.standing.formatted_rank}} <br/>
+          <h3>Recent Results</h3>
+          <ul>
+          {% for g in data.home_previous_games %}
+            <li class="list-unstyled">{{g.home_team.medium_name}} {{g.box_score.score.home.score }} , {{g.away_team.medium_name}} {{g.box_score.score.away.score}}</li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+
+
+        {% if blurbs.opponentPreview %}
+        <div class="section-header">The Enemy</div>
+        <div class="row">
+          <div class="col-xs-12">
+              {{blurbs.opponentPreview|safe|nl2br}}
+          </div>
+        </div>        
+        {% endif %}
+        {% if blurbs.managerPreview %}
+        <div class="section-header">Manager's Take</div>
+        <div class="row">
+          <div class="col-xs-12">
+              {{blurbs.managerPreview|safe|nl2br}}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if gameNotes %}
+          <div class="section-header">Game Notes</div>
+          {% for g in gameNotes %}
+            <div class="media" style="margin-bottom: 10px">
+              <div class="media-left media-top">
+                  <div class="free-form-number">{{loop.index}}</div>
+              </div>
+              <div class="media-body">{{g|safe|nl2br}}</div>
+            </div>
+          {% endfor %}   
+        {% endif %}  
+
+        {% if winningKeys %}
+          <div class="section-header">Keys to a Win</div>
+          {% for g in winningKeys %}
+            <div class="media" style="margin-bottom: 10px">
+              <div class="media-left media-top">
+                  <div class="free-form-number">{{loop.index}}</div>
+              </div>
+              <div class="media-body">{{g|safe|nl2br}}</div>
+            </div>
+          {% endfor %}   
+        {% endif %}  
+
+
+        {% if losingKeys %}
+          <div class="section-header">It'll end in tears if...</div>
+          {% for g in losingKeys %}
+            <div class="media" style="margin-bottom: 10px">
+              <div class="media-left media-top">
+                  <div class="free-form-number">{{loop.index}}</div>
+              </div>
+              <div class="media-body">{{g|safe|nl2br}}</div>
+            </div>
+          {% endfor %}   
+        {% endif %}  
+
+      </div>
+    </div>

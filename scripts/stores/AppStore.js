@@ -13,8 +13,11 @@ var _message = null;
 var _location = null
 var _mlbReactionHtml = {};
 var _mlsReactionHtml = {};
+var _mlsPreviewHtml = {};
 var _createDraftResult = {};
 var _mlsBox = {};
+var _mlsPreview = {};
+
 
 var AppStore = assign({}, EventEmitter.prototype, {
 
@@ -24,11 +27,17 @@ var AppStore = assign({}, EventEmitter.prototype, {
   getMlsBox: function() {
     return _mlsBox;
   },
+  getMlsPreview: function() {
+    return _mlsPreview;
+  },
   getMlbReactionHtml: function() {
     return _mlbReactionHtml;
   },
   getMlsReactionHtml: function() {
     return _mlsReactionHtml;
+  },
+  getMlsPreviewHtml: function() {
+    return _mlsPreviewHtml;
   },
   getTeams: function() {
     return _teams;
@@ -75,15 +84,18 @@ AppDispatcher.register(function(action) {
        _mlsReactionHtml = action.mlsReactionHtml;
       AppStore.emitChange();
          break;
+    case AppConstants.RECEIVE_MLS_PREVIEW_HTML:
+       _mlsPreviewHtml = action.mlsPreviewHtml;
+      AppStore.emitChange();
+         break;
     case AppConstants.SET_CREATE_DRAFT_RESULT:
       _createDraftResult = action.result;
       AppStore.emitChange();
     case AppConstants.RECEIVE_MLS_BOX:
-      console.log("MLS box is updated in store");
-      var stack = new Error().stack;
-  console.log("PRINTING CALL STACK");
-  console.log( stack );
       _mlsBox = action.box;
+      AppStore.emitChange();
+    case AppConstants.RECEIVE_MLS_PREVIEW:
+      _mlsPreview = action.preview;
       AppStore.emitChange();
     default:
       // no op

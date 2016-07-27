@@ -44,8 +44,8 @@ var SoccerReactionForm = React.createClass({
     }
 
     var freeForm = [];
-    for (var i = 0; i<5; i++) {
-      freeForm.push(<FreeForm handleTextChange={this.props.handleTextChange} index={i}/>);
+    for (var i = 1; i<6; i++) {
+      freeForm.push(<FreeForm handleTextChange={this.props.handleTextChange} id={'freeForm' + i} name={i}/>);
     }
 
     
@@ -62,7 +62,7 @@ var SoccerReactionForm = React.createClass({
       </div>
       <h3>Notes</h3>
       <div className="playerList well">
-          {{freeForm}}
+          {freeForm}
       </div>      
       </div>
     );

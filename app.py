@@ -12,7 +12,7 @@ from dotmap import DotMap
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
 
 app = Flask(__name__, static_url_path='')
-app.Debug = True
+app.debug = True
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 
@@ -24,13 +24,28 @@ def send_js(path):
 def send_index():
     return render_template("index.html")
 
+import re
+from jinja2 import evalcontextfilter, Markup, escape
+
+_paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
+
+@evalcontextfilter
+def nl2br(eval_ctx, value):
+    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', Markup('<br>\n'))
+                          for p in _paragraph_re.split(escape(value)))
+    if eval_ctx.autoescape:
+        result = Markup(result)
+    return result
 
 def get(uri):
+  print "Uri is " + uri
   r = requests.get('https://api.thescore.com' + uri)
   if r.status_code == 200:
     return r.json()
   else:
     raise Exception("boom!")
+
+app.jinja_env.filters['nl2br'] = nl2br
 
 
 class TheScore:
@@ -63,24 +78,18 @@ class TheScore:
     return filtered_records
 
   def get_previous_games(self, team_uri, count=3):
-    return get(team_uri + "/events/previous?rpp=" + count)
+    return get(team_uri + "/events/previous?rpp=" + str(count))
 
   def get_upcoming_games(self, team_uri, count=1):
-    return get(team_uri + "/events/upcoming?rpp=1" + count)
+    return get(team_uri + "/events/upcoming?rpp=1" + str(count))
 
   def get_next_game(self, team_uri):
-    upcoming = get_upcoming_games(team_uri, 1)
+    upcoming = self.get_upcoming_games(team_uri, 1)
     if len(upcoming) > 0:
       return upcoming[0]
     else:
       return None
 
-  def get_other_team_id(self, event, team_id):
-    if event['away_team']['id'] == id and event['home_team']['id'] != id:
-      return event['home_team']['id']
-    if event['home_team']['id'] == id and event['away_team']['id'] != id:
-      return event['away_team']['id']
-    return None
 
 class MLS(TheScore):
 
@@ -245,22 +254,62 @@ def get_aligned_box_score(team_id):
   return context
 
 
-@app.route("/mls/preview/<int:team_id>")
-def get_mls_team_preview():
+def get_mls_preview_data(team_id):
   mls = MLS()
   team_uri = "/mls/teams/" + str(team_id)
   next_game = mls.get_next_game(team_uri)
   if next_game == None:
     raise Exception("No next game for " + str(team_id))
-  other_team_id = mls.get_other_team_id(next_game, team_id)
 
   context = {
     "next_game": next_game,
-    "previous_games": mls.get_previous_games(team_uri),
-    "opponent_previous_games": mls.get_previous_games("/mls/teams/" + str(other_team_id))
+    "home_team": get(next_game['home_team']['api_uri']),
+    "away_team": get(next_game['away_team']['api_uri']),    
+    "home_previous_games": mls.get_previous_games(next_game['home_team']['api_uri']),
+    "away_previous_games": mls.get_previous_games(next_game['away_team']['api_uri']),
+    'event_details': get(next_game['resource_uri'])
   }
 
-  return jsonify(context)
+  return context
+
+@app.route("/mls/preview/<int:team_id>")
+def get_mls_team_preview(team_id):
+  return jsonify(get_mls_preview_data(team_id))
+
+
+
+def get_list_from_params(prefix, dict):
+  l = []
+  for x in range(1, 11):
+    k = prefix + str(x)
+    if k in dict:
+      l.append(dict[k])
+
+  return l
+
+@app.route("/mls/generate-preview", methods=['POST'])
+def generate_mlb_preview():
+  payload = json.loads(request.form["data"])
+  team_id = int(payload["team_id"])
+  evaluation = payload['evaluation']
+  blurbs = evaluation['blurbs']
+  print blurbs
+
+
+
+  data = get_mls_preview_data(team_id)
+
+  html = render_template('mlb-preview.html', data=data, blurbs=blurbs, 
+    gameNotes=get_list_from_params('gameNotes', blurbs),
+    winningKeys=get_list_from_params('winIf', blurbs),
+    losingKeys=get_list_from_params('loseIf', blurbs)
+    )
+
+  return jsonify({"html": html});
+
+
+
+
 
 
 @app.route("/teams", methods=['POST'])
@@ -394,7 +443,7 @@ def generate_reaction():
 
 
   freeForm = []
-  for x in range(0, 5):
+  for x in range(1, 6):
     if 'freeForm' + str(x) in blurbs:
       freeForm.append(blurbs['freeForm' + str(x)])
 
@@ -404,6 +453,9 @@ def generate_reaction():
    unevenInnings=len(data["overview"]['line_scores']['home']) != len(data["overview"]['line_scores']['away']))
 
   return jsonify({"html": html});
+
+
+
 
 
 @app.route("/mls/generate-reaction", methods=['POST'])
