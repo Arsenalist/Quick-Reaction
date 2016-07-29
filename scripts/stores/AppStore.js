@@ -17,6 +17,7 @@ var _mlsPreviewHtml = {};
 var _createDraftResult = {};
 var _mlsBox = {};
 var _mlsPreview = {};
+var _publishOptions = [];
 
 
 var AppStore = assign({}, EventEmitter.prototype, {
@@ -44,6 +45,9 @@ var AppStore = assign({}, EventEmitter.prototype, {
   },
   getCreateDraftResult: function() {
     return _createDraftResult;
+  },
+  getPublishOptions: function() {
+    return _publishOptions;
   },
   emitChange: function() {
     this.emit(CHANGE_EVENT);
@@ -96,6 +100,9 @@ AppDispatcher.register(function(action) {
       AppStore.emitChange();
     case AppConstants.RECEIVE_MLS_PREVIEW:
       _mlsPreview = action.preview;
+      AppStore.emitChange();
+    case AppConstants.RECEIVE_PUBLISH_OPTIONS:
+      _publishOptions = action.publishOptions;
       AppStore.emitChange();
     default:
       // no op

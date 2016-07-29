@@ -21,6 +21,7 @@ def send_js(path):
     return send_from_directory('scripts', path)
 
 @app.route('/index.html')
+@app.route('/')
 def send_index():
     return render_template("index.html")
 
@@ -38,7 +39,6 @@ def nl2br(eval_ctx, value):
     return result
 
 def get(uri):
-  print "Uri is " + uri
   r = requests.get('https://api.thescore.com' + uri)
   if r.status_code == 200:
     return r.json()
@@ -341,39 +341,69 @@ def read_file(file_name):
   return contents
 
 def get_config():
-  return yaml.load(read_file(os.path.join(APP_ROOT, 'config/config.yaml')))
+  config_text = os.environ.get('config', read_file(os.path.join(APP_ROOT, 'config/config.json')))
+  return json.loads(config_text)
 
-def create_wordpress_draft(title, html, tags):
-  config = get_config()
+def create_wordpress_draft(publish_target, title, html, tags):
   post = WordPressPost()
   today = datetime.date.today()
   post.title = title
   post.content = html
-  wordpress_username = os.environ.get('wordpress_username', config["wordpress"]["username"])
-  wordpress_password = os.environ.get('wordpress_password', config["wordpress"]["password"])
-  client = Client( config["wordpress"]["url"] + "/xmlrpc.php",  wordpress_username,  wordpress_password)
-  category = client.call(taxonomies.GetTerm('category',  config["wordpress"]["default_category_id"]))
+  client = Client( publish_target["url"] + "/xmlrpc.php",  publish_target["username"],  publish_target["password"])
+  category = client.call(taxonomies.GetTerm('category',  publish_target["default_category_id"]))
   post.terms.append(category)
-  post.user = config["wordpress"]["default_user_id"]
+  post.user = publish_target["default_user_id"]
   post.terms_names = {'post_tag': tags}
   post.comment_status = 'open'
   post.id = client.call(posts.NewPost(post))
   return post
 
+def get_publish_options_by_type(type):
+  prefix = type.split("-")[0]
+  config = get_config()
+  return config[prefix]
+
+
+@app.route("/publish-options/<type>")
+def get_publish_options(type):  
+  publish_options = get_publish_options_by_type(type)
+  publish_options_cleaned = []
+  for p in publish_options:
+    publish_options_cleaned.append({'id': p['id'], 'name': p['name']})
+
+  return jsonify(publish_options_cleaned)
+
 @app.route("/create-draft", methods=['POST'])
-def create_mlb_draft():
+def create_draft():
   data = DotMap(json.loads(request.form["data"]))
+  publish_options = get_publish_options_by_type(data.type)
+  publish_target = None
+  publishTargetId = request.form["publishTarget"]
+  for p in publish_options:
+    if p['id'] == publishTargetId:
+      publish_target = p
+      break
+
+  if publish_target == None:
+    raise "No publish target found."
+
   if data.type == 'mlb-reaction':
     title = 'Quick Reaction: ' + data.context.event.away_team.full_name + ' ' + str(data.context.away_score_runs) + ', ' + data.context.event.home_team.full_name + ' ' + str(data.context.home_score_runs)
     tags = [data.context.event.home_team.full_name, data.context.event.away_team.full_name]
-    post = create_wordpress_draft(title, data.html, tags)
-    return jsonify({"status": "OK", "url": "http://www.bluejaysrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
+    post = create_wordpress_draft(publish_target, title, data.html, tags)
+    return jsonify({"status": "OK", "url": publish_target['url'] + "/wp-admin/post.php?post=" + post.id + "&action=edit"})
 
   elif data.type == 'mls-reaction':
     title = 'Quick Reaction: ' + data.context.event.home_team.full_name + ' ' + str(data.context.score.home.score) + ', ' + data.context.event.away_team.full_name + ' ' + str(data.context.score.away.score)
     tags = [data.context.event.home_team.full_name, data.context.event.away_team.full_name]
-    post = create_wordpress_draft(title, data.html, tags)
-    return jsonify({"status": "OK", "url": "http://www.tfcrepublic.com/wp-admin/post.php?post=" + post.id + "&action=edit"})
+    post = create_wordpress_draft(publish_target, title, data.html, tags)
+    return jsonify({"status": "OK", "url": publish_target['url'] + "/wp-admin/post.php?post=" + post.id + "&action=edit"})
+
+  elif data.type == 'mls-preview':
+    title = 'Match Preview: ' + data.context.home_team.full_name + ' vs ' + data.context.away_team.full_name
+    tags = [data.context.home_team.full_name, data.context.away_team.full_name]
+    post = create_wordpress_draft(publish_target, title, data.html, tags)
+    return jsonify({"status": "OK", "url": publish_target['url'] + "/wp-admin/post.php?post=" + post.id + "&action=edit"})
 
 
 def apply_evaluation(evaluation, records):

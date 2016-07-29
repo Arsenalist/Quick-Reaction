@@ -59,7 +59,13 @@ var AppActions = {
       actionType: AppConstants.SET_CREATE_DRAFT_RESULT,
       result: createDraftResult
     });
-  }  
+  },
+  setPublishOptions: function(publishOptions) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.RECEIVE_PUBLISH_OPTIONS,
+      publishOptions: publishOptions
+    });
+  }    
 };
 
 module.exports = AppActions;

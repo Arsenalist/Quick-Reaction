@@ -1,0 +1,24 @@
+{
+  "mlb": [
+    {
+      "id": "bluejays-republic",
+      "name": "Blue Jays Republic",
+      "username": "Arsenalist",
+      "password": "",
+      "url": "http://www.bluejaysrepublic.com",
+      "default_category_id": 3,
+      "default_user_id": 6
+    }
+  ],
+  "mls": [
+    {
+      "id": "tfc-republic",
+      "name": "TFC Republic",
+      "username": "Arsenalist",
+      "password": "",
+      "url": "http://www.tfcrepublic.com",
+      "default_category_id": 3,
+      "default_user_id": 3
+    }
+  ]
+}

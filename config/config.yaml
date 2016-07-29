@@ -1,6 +1,0 @@
-wordpress:
-  username: ''
-  password: ''
-  url: http://www.bluejaysrepublic.com
-  default_category_id: 3
-  default_user_id: 6

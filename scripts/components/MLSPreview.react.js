@@ -97,7 +97,7 @@ var MLSPreview = React.createClass({
     if (this.state.thinkingGenerateReaction) {
       rightSide = <div>Generating reaction...</div>
     } else {
-      rightSide = <ReactionPreview type="mls-preview" html={this.state.html} />
+      rightSide = <ReactionPreview type="mls-preview" context={this.state.nextGame} html={this.state.html} />
     }
 
     return (

@@ -17,14 +17,14 @@
         </div>
 
         <div class="col-xs-6 text-center">
-          <img src="{{data.home_team.logos.small}}"/>
-          <h2>{{data.home_team.medium_name}}</h2>          
-          <strong>Record:</strong> {{data.home_team.standing.short_record}} <br/>
-          <strong>Last 5:</strong> {{data.home_team.standing.last_five_games_record}} <br/>
-          <strong>Rank:</strong> {{data.home_team.standing.formatted_rank}} <br/>
+          <img src="{{data.away_team.logos.small}}"/>
+          <h2>{{data.away_team.medium_name}}</h2>          
+          <strong>Record:</strong> {{data.away_team.standing.short_record}} <br/>
+          <strong>Last 5:</strong> {{data.away_team.standing.last_five_games_record}} <br/>
+          <strong>Rank:</strong> {{data.away_team.standing.formatted_rank}} <br/>
           <h3>Recent Results</h3>
           <ul>
-          {% for g in data.home_previous_games %}
+          {% for g in data.away_previous_games %}
             <li class="list-unstyled">{{g.home_team.medium_name}} {{g.box_score.score.home.score }} , {{g.away_team.medium_name}} {{g.box_score.score.away.score}}</li>
           {% endfor %}
           </ul>
@@ -86,6 +86,4 @@
             </div>
           {% endfor %}   
         {% endif %}  
-
-      </div>
     </div>

@@ -20,6 +20,11 @@ var AppActionCreator = {
         AppActions.setMlsPreview(data);
      });
   },
+  getPublishOptions: function(type) {
+    jQuery.get( "/publish-options/" + type, function( data ) {
+        AppActions.setPublishOptions(data);
+     });
+  },
   getTeams: function(league) {
       jQuery.ajax({
           url: "/teams",
@@ -77,12 +82,12 @@ var AppActionCreator = {
           }
       });
   },
-  createDraft: function(data) {
+  createDraft: function(data, publishTarget) {
       jQuery.ajax({
           url: "/create-draft",
           type: "POST",
           dataType: "json",
-          data: {data: JSON.stringify(data)},
+          data: {data: JSON.stringify(data), publishTarget: publishTarget},
           success: function (data) {
             AppActions.setCreateDraftResult(data);
           }
