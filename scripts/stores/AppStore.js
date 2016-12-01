@@ -12,10 +12,12 @@ var _formation = null;
 var _message = null;
 var _location = null
 var _mlbReactionHtml = {};
+var _nbaReactionHtml = {};
 var _mlsReactionHtml = {};
 var _mlsPreviewHtml = {};
 var _createDraftResult = {};
 var _mlsBox = {};
+var _nbaBox = {};
 var _mlsPreview = {};
 var _publishOptions = [];
 
@@ -28,11 +30,17 @@ var AppStore = assign({}, EventEmitter.prototype, {
   getMlsBox: function() {
     return _mlsBox;
   },
+  getNbaBox: function() {
+    return _nbaBox;
+  },
   getMlsPreview: function() {
     return _mlsPreview;
   },
   getMlbReactionHtml: function() {
     return _mlbReactionHtml;
+  },
+  getNbaReactionHtml: function() {
+    return _nbaReactionHtml;
   },
   getMlsReactionHtml: function() {
     return _mlsReactionHtml;
@@ -84,6 +92,10 @@ AppDispatcher.register(function(action) {
        _mlbReactionHtml = action.mlbReactionHtml;
       AppStore.emitChange();
          break;
+    case AppConstants.RECEIVE_NBA_REACTION_HTML:
+       _nbaReactionHtml = action.nbaReactionHtml;
+      AppStore.emitChange();
+         break;
     case AppConstants.RECEIVE_MLS_REACTION_HTML:
        _mlsReactionHtml = action.mlsReactionHtml;
       AppStore.emitChange();
@@ -97,6 +109,9 @@ AppDispatcher.register(function(action) {
       AppStore.emitChange();
     case AppConstants.RECEIVE_MLS_BOX:
       _mlsBox = action.box;
+      AppStore.emitChange();
+    case AppConstants.RECEIVE_NBA_BOX:
+      _nbaBox = action.box;
       AppStore.emitChange();
     case AppConstants.RECEIVE_MLS_PREVIEW:
       _mlsPreview = action.preview;

@@ -18,6 +18,12 @@ var AppActions = {
       box: box
     });
   },
+  setNbaBox: function(box) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.RECEIVE_NBA_BOX,
+      box: box
+    });
+  },
   setMlsPreview: function(preview) {
     AppDispatcher.dispatch({
       actionType: AppConstants.RECEIVE_MLS_PREVIEW,
@@ -34,6 +40,12 @@ var AppActions = {
     AppDispatcher.dispatch({
       actionType: AppConstants.RECEIVE_MLB_REACTION_HTML,
       mlbReactionHtml: mlbReactionHtml
+    });
+  },
+  setNbaReactionHtml: function(nbaReactionHtml) {
+    AppDispatcher.dispatch({
+      actionType: AppConstants.RECEIVE_NBA_REACTION_HTML,
+      nbaReactionHtml: nbaReactionHtml
     });
   },
   setMlsPreviewHtml: function(mlsPreviewHtml) {

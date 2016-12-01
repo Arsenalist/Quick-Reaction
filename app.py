@@ -39,6 +39,7 @@ def nl2br(eval_ctx, value):
     return result
 
 def get(uri):
+  print "uri is " + uri
   r = requests.get('https://api.thescore.com' + uri)
   if r.status_code == 200:
     return r.json()
@@ -89,6 +90,23 @@ class TheScore:
       return upcoming[0]
     else:
       return None
+
+
+class NBA(TheScore):
+
+  def get_teams(self):
+    return get('/nba/teams/')
+
+
+  def get_latest_box_score(self, team_id):
+    latest_game = self.find_latest_game('/nba/teams/' + str(team_id))
+    game = get(latest_game["api_uri"])
+    box_score_uri = game["box_score"]["api_uri"]
+
+    return {
+      'overview': get(box_score_uri),
+      'player_records': get(box_score_uri + '/player_records?rpp=-1')
+    }
 
 
 class MLS(TheScore):
@@ -232,6 +250,21 @@ def get_aligned_mls_box_score(team_id):
   }
   return context
 
+
+def get_aligned_nba_box_score(team_id):
+  nba = NBA()
+  box = nba.get_latest_box_score(team_id)
+  alignment = nba.get_alignment(box['overview'], team_id)
+
+  relevant_player_records = nba.filter_by_alignment(box['player_records'], alignment)
+
+  context = {
+    "overview": box['overview'],
+    "player_records": relevant_player_records
+  }
+
+  return context  
+
 def get_aligned_box_score(team_id):
   
   mlb = MLB()
@@ -321,11 +354,19 @@ def get_teams():
     elif league == 'mls':
       mls = MLS()
       return jsonify(mls.get_teams())
+    elif league == 'nba':
+      nba = NBA()
+      return jsonify(nba.get_teams())
 
 
 @app.route("/mls/box/<id>")
 def get_mls_box(id):
   context = get_aligned_mls_box_score(int(id))
+  return jsonify(context)
+
+@app.route("/nba/box/<id>")
+def get_nba_box(id):
+  context = get_aligned_nba_box_score(int(id))
   return jsonify(context)
 
 
@@ -394,6 +435,12 @@ def create_draft():
     return jsonify({"status": "OK", "url": publish_target['url'] + "/wp-admin/post.php?post=" + post.id + "&action=edit"})
 
   elif data.type == 'mls-reaction':
+    title = 'Quick Reaction: ' + data.context.event.home_team.full_name + ' ' + str(data.context.score.home.score) + ', ' + data.context.event.away_team.full_name + ' ' + str(data.context.score.away.score)
+    tags = [data.context.event.home_team.full_name, data.context.event.away_team.full_name]
+    post = create_wordpress_draft(publish_target, title, data.html, tags)
+    return jsonify({"status": "OK", "url": publish_target['url'] + "/wp-admin/post.php?post=" + post.id + "&action=edit"})
+
+  elif data.type == 'nba-reaction':
     title = 'Quick Reaction: ' + data.context.event.home_team.full_name + ' ' + str(data.context.score.home.score) + ', ' + data.context.event.away_team.full_name + ' ' + str(data.context.score.away.score)
     tags = [data.context.event.home_team.full_name, data.context.event.away_team.full_name]
     post = create_wordpress_draft(publish_target, title, data.html, tags)
@@ -487,6 +534,37 @@ def generate_reaction():
 
 
 
+
+@app.route("/nba/generate-reaction", methods=['POST'])
+def generate_nba_reaction():
+  payload = json.loads(request.form["data"])
+  evaluation = payload['evaluation']
+  blurbs = evaluation['blurbs']
+  grades = evaluation['grades']
+
+  data = get_aligned_nba_box_score(int(payload['team_id']))
+  nba = NBA()
+  
+  data['player_records'] = apply_evaluation(evaluation, data['player_records'])
+  for d in data['player_records']:
+    p = DotMap(d)
+    d['stats'] = "some server side stats"
+
+  players = []  
+  for p in data['player_records']:
+    stats = render_template('nba-player-stats.html', p=p)
+    if ('blurb' in p and p['blurb'] != None):
+      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if 'grade' in p else None, 
+        personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
+      players.append(evaluation)
+
+  freeForm = []
+  for x in range(0, 5):
+    if 'freeForm' + str(x) in blurbs:
+      freeForm.append(blurbs['freeForm' + str(x)])
+  html = render_template('nba-reaction.html', data=data, players=players, freeForm=freeForm)
+
+  return jsonify({"html": html});
 
 @app.route("/mls/generate-reaction", methods=['POST'])
 def generate_mls_reaction():

@@ -1,0 +1,44 @@
+<style>.mlb-reaction .section-header {background: #134A8E; color: white; padding: 10px; margin-bottom: 5px; font-weight: bold; font-size: 1.3em} .mlb-reaction .grade {background: #315233; border: 6px solid #977252; color: white; font-size:35px; font-weight: bold; text-align: center; width: 100%; margin-top: 10px} .free-form-number { border: 3px solid #808080; color: #808080; font-size:35px; font-weight: bold; text-align: center; height: 50px; width: 50px;}</style>
+
+<div class="container mlb-reaction">
+<div class="row">
+  <div class="col-xs-6 col-md-offset-3 col-md-2 text-right">
+    <img src="{{data.overview.event.away_team.logos.w72xh72}}"/>    
+  </div>
+  <div class="col-xs-5  col-md-2">
+      <h3>{{data.overview.event.away_team.medium_name}}</h3>
+  </div>
+  <div class="col-xs-1 col-md-5">
+    <h3><strong>{{data.overview.score.away.score}}</strong></h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-6 col-md-offset-3 col-md-2 text-right">
+    <img src="{{data.overview.event.home_team.logos.w72xh72}}"/>    
+  </div>
+  <div class="col-xs-5 col-md-2">
+      <h3>{{data.overview.event.home_team.medium_name}}</h3>
+  </div>
+  <div class="col-xs-1 col-md-5">
+    <h3><strong>{{data.overview.score.home.score}}</strong></h3>
+  </div>
+</div>
+{% if players %}
+  {% for p in players %}
+    {{p|safe}}
+  {% endfor %}
+{% endif %}
+{% if freeForm %}
+  <div class="section-header">Things We Saw</div>
+  {% for f in freeForm %}
+    <div class="media" style="margin-bottom: 10px">
+      <div class="media-left media-top">
+          <div class="free-form-number">{{loop.index}}</div>
+      </div>
+      <div class="media-body">{{f|safe}}</div>
+    </div>
+  {% endfor %}  
+{% endif %}  
+</div>
+  

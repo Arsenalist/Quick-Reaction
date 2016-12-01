@@ -15,6 +15,11 @@ var AppActionCreator = {
         AppActions.setMlsBox(data);
      });
   },
+  getNbaBox: function(teamId) {
+    jQuery.get( "/nba/box/" + teamId, function( data ) {
+        AppActions.setNbaBox(data);
+     });
+  },
   getMlsPreview: function(teamId) {
     jQuery.get( "/mls/preview/" + teamId, function( data ) {
         AppActions.setMlsPreview(data);
@@ -49,6 +54,21 @@ var AppActionCreator = {
           data: {data: JSON.stringify(data)},
           success: function (data) {
               AppActions.setMlbReactionHtml(data);              
+          }
+      });
+  },
+  getNbaReactionHtml: function(teamId, evaluation) {
+      var data = {
+        team_id: teamId,
+        evaluation: evaluation
+      }
+      jQuery.ajax({
+          url: "/nba/generate-reaction",
+          type: "POST",
+          dataType: "json",
+          data: {data: JSON.stringify(data)},
+          success: function (data) {
+              AppActions.setNbaReactionHtml(data);              
           }
       });
   },
