@@ -546,15 +546,11 @@ def generate_nba_reaction():
   nba = NBA()
   
   data['player_records'] = apply_evaluation(evaluation, data['player_records'])
-  for d in data['player_records']:
-    p = DotMap(d)
-    d['stats'] = "some server side stats"
-
   players = []  
   for p in data['player_records']:
     stats = render_template('nba-player-stats.html', p=p)
     if ('blurb' in p and p['blurb'] != None):
-      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if 'grade' in p else None, 
+      evaluation = render_template('nba-evaluation.html', blurb=p['blurb'], stats=stats, gradeImage=p['grade'] if 'grade' in p else None, 
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       players.append(evaluation)
 
