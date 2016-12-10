@@ -67,6 +67,7 @@ var NBAReaction = React.createClass({
         {
           overview: box.overview,
           player_records: box.player_records,
+          manager: box.manager,
           thinkingTeamSelect: false,
           thinkingGenerateReaction: false,
           html: html
@@ -104,7 +105,8 @@ var NBAReaction = React.createClass({
             <NBAReactionForm 
                 handleTextChange={this.handleTextChange} 
                 handleGradeChange={this.handleGradeChange} 
-                playerRecords={this.state.player_records}/>
+                playerRecords={this.state.player_records}
+                manager={this.state.manager}/>
             {generateButton}
                 
         </div>

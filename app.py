@@ -38,8 +38,8 @@ def nl2br(eval_ctx, value):
         result = Markup(result)
     return result
 
+
 def get(uri):
-  print "uri is " + uri
   r = requests.get('https://api.thescore.com' + uri)
   if r.status_code == 200:
     return r.json()
@@ -94,9 +94,17 @@ class TheScore:
 
 class NBA(TheScore):
 
+  coach_mapping = {
+    5: {'image': 'http://a.espncdn.com/i/headshots/nba/coaches/65/6726.jpg', 'name': 'Dwane Casey'}
+  }
+
   def get_teams(self):
     return get('/nba/teams/')
 
+  def get_coach(self, team_id):
+    if team_id not in self.coach_mapping:
+      return None
+    return self.coach_mapping[team_id]
 
   def get_latest_box_score(self, team_id):
     latest_game = self.find_latest_game('/nba/teams/' + str(team_id))
@@ -257,10 +265,12 @@ def get_aligned_nba_box_score(team_id):
   alignment = nba.get_alignment(box['overview'], team_id)
 
   relevant_player_records = nba.filter_by_alignment(box['player_records'], alignment)
+  coach = nba.get_coach(team_id)
 
   context = {
     "overview": box['overview'],
-    "player_records": relevant_player_records
+    "player_records": relevant_player_records,
+    "manager": coach
   }
 
   return context  
@@ -554,11 +564,18 @@ def generate_nba_reaction():
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       players.append(evaluation)
 
+  managerHtml = ''
+  if 'managerBlurb' in blurbs:
+    manager = data['manager']
+    managerHtml = render_template('nba-evaluation.html', stats='', blurb=blurbs['managerBlurb'], gradeImage=grades['managerGrade'] if 'managerGrade' in grades else None,
+      personName=manager['name'], personImage=manager['image'])
+
+
   freeForm = []
   for x in range(0, 5):
     if 'freeForm' + str(x) in blurbs:
       freeForm.append(blurbs['freeForm' + str(x)])
-  html = render_template('nba-reaction.html', data=data, players=players, freeForm=freeForm)
+  html = render_template('nba-reaction.html', data=data, players=players, managerHtml=managerHtml, freeForm=freeForm)
 
   return jsonify({"html": html});
 
