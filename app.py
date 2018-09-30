@@ -95,7 +95,7 @@ class TheScore:
 class NBA(TheScore):
 
   coach_mapping = {
-    5: {'image': 'http://a.espncdn.com/i/headshots/nba/coaches/65/6726.jpg', 'name': 'Dwane Casey'}
+    5: {'image': 'https://i.imgur.com/QkbchIz.jpg', 'name': 'Nick Nurse'}
   }
 
   def get_teams(self):
