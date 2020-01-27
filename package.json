@@ -6,7 +6,7 @@
   "dependencies": {
     "connect": "^3.4.1",
     "flux": "2.0.3",
-    "jquery": "^2.2.4",
+    "jquery": "^3.4.1",
     "keymirror": "~0.1.0",
     "lodash": "^4.13.1",
     "object-assign": "^1.0.0",
