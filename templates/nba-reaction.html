@@ -21,6 +21,24 @@
 {% if players %}
   {% for p in players %}
     {{p|safe}}
+      {% if loop.index == 3 %}
+          <tr>
+            <td colspan="3" style="text-align: center">
+                <!-- Ezoic - Quick Reaction - In Content 1 - mid_content -->
+                <div id="ezoic-pub-ad-placeholder-160"> </div>
+                <!-- End Ezoic - Quick Reaction - In Content 1 - mid_content -->
+            </td>
+          </tr>
+      {% endif %}
+      {% if loop.index == 7 %}
+          <tr>
+            <td colspan="3" style="text-align: center">
+                <!-- Ezoic - Quick Reaction - In Content 2 - mid_content -->
+                <div id="ezoic-pub-ad-placeholder-161"> </div>
+                <!-- End Ezoic - Quick Reaction - In Content 2 - mid_content -->
+            </td>
+          </tr>
+      {% endif %}
   {% endfor %}
 {% endif %}
 {{managerHtml|safe}}
