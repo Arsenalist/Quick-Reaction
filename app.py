@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-from __future__ import print_function
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -10,7 +8,6 @@ from wordpress_xmlrpc.methods.posts import NewPost
 from wordpress_xmlrpc.methods import posts, taxonomies, users
 import datetime, yaml
 from dotmap import DotMap
-from six.moves import range
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
 
