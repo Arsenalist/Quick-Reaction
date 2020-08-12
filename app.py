@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, send_from_directory, render_template
 from wordpress_xmlrpc import Client, WordPressPost
 from wordpress_xmlrpc.methods.posts import NewPost
 from wordpress_xmlrpc.methods import posts, taxonomies, users
-import datetime, yaml
+import datetime
 from dotmap import DotMap
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))   # refers to application_top
