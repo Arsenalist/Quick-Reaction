@@ -2,7 +2,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var AppConstants = require('../constants/AppConstants');
 var AppActions = require('../actions/AppActions');
 var jQuery = require('jquery/dist/jquery');
-const nbaBaseUrl = 'http://localhost:8000';
+const nbaBaseUrl = 'http://espnapi.raptorsrepublic.com';
 
 var AppActionCreator = {
 
@@ -27,7 +27,7 @@ var AppActionCreator = {
      });
   },
   getPublishOptions: function(type) {
-    jQuery.get( "/publish-options/" + type, function( data ) {
+    jQuery.get("/publish-options/" + type, function( data ) {
         AppActions.setPublishOptions(data);
      });
   },
@@ -58,7 +58,7 @@ var AppActionCreator = {
           dataType: "json",
           data: {data: JSON.stringify(data)},
           success: function (data) {
-              AppActions.setMlbReactionHtml(data);              
+              AppActions.setMlbReactionHtml(data);
           }
       });
   },
@@ -73,7 +73,7 @@ var AppActionCreator = {
           dataType: "json",
           data: {data: JSON.stringify(data)},
           success: function (data) {
-              AppActions.setNbaReactionHtml(data);              
+              AppActions.setNbaReactionHtml(data);
           }
       });
   },
@@ -88,7 +88,7 @@ var AppActionCreator = {
           dataType: "json",
           data: {data: JSON.stringify(data)},
           success: function (data) {
-              AppActions.setMlsPreviewHtml(data);              
+              AppActions.setMlsPreviewHtml(data);
           }
       });
   },
@@ -103,7 +103,7 @@ var AppActionCreator = {
           dataType: "json",
           data: {data: JSON.stringify(data)},
           success: function (data) {
-              AppActions.setMlsReactionHtml(data);              
+              AppActions.setMlsReactionHtml(data);
           }
       });
   },
@@ -117,7 +117,7 @@ var AppActionCreator = {
             AppActions.setCreateDraftResult(data);
           }
       });
-  }  
+  }
 }
 
 module.exports = AppActionCreator;
