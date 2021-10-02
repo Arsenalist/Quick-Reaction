@@ -95,7 +95,8 @@ class TheScore:
 class NBA(TheScore):
 
   coach_mapping = {
-    5: {'image': 'https://i.imgur.com/QkbchIz.jpg', 'name': 'Nick Nurse'}
+    5: {'image': 'https://i.imgur.com/QkbchIz.jpg', 'name': 'Nick Nurse'},
+    'tor': {'image': 'https://i.imgur.com/QkbchIz.jpg', 'name': 'Nick Nurse'}
   }
 
   def get_teams(self):
@@ -107,14 +108,14 @@ class NBA(TheScore):
     return self.coach_mapping[team_id]
 
   def get_latest_box_score(self, team_id):
-    latest_game = self.find_latest_game('/nba/teams/' + str(team_id))
-    game = get(latest_game["api_uri"])
-    box_score_uri = game["box_score"]["api_uri"]
-
-    return {
-      'overview': get(box_score_uri),
-      'player_records': get(box_score_uri + '/player_records?rpp=-1')
-    }
+    return requests.get('http://localhost:8000/nba/box/' + team_id).json()
+    # latest_game = self.find_latest_game('/nba/teams/' + str(team_id))
+    # game = get(latest_game["api_uri"])
+    # box_score_uri = game["box_score"]["api_uri"]
+    # return {
+    #   'overview': get(box_score_uri),
+    #   'player_records': get(box_score_uri + '/player_records?rpp=-1')
+    # }
 
 
 class MLS(TheScore):
@@ -180,12 +181,12 @@ class MLB(TheScore):
 
       biggestValue = 0
       biggestIndex = 0
-      i = 0 
+      i = 0
       for t in totals:
         if t > biggestValue:
           biggestIndex = i
           biggestValue = t
-        i = i + 1    
+        i = i + 1
 
       return player_records[biggestIndex]
 
@@ -227,7 +228,7 @@ class MLB(TheScore):
     player_records = requests.get("https://api.thescore.com" + box_score_uri + "/player_records?rpp=-1").json()
 
     # add won/loss info to pitching_records
-    for p in pitching_records:  
+    for p in pitching_records:
       record = ''
       if p["game_lost"]:
         record = record + 'L, '
@@ -273,10 +274,10 @@ def get_aligned_nba_box_score(team_id):
     "manager": coach
   }
 
-  return context  
+  return context
 
 def get_aligned_box_score(team_id):
-  
+
   mlb = MLB()
   box = mlb.get_latest_box_score(team_id)
   alignment = mlb.get_alignment(box.overview, team_id)
@@ -289,7 +290,7 @@ def get_aligned_box_score(team_id):
   context = {
     "overview": box.overview,
     "summaries": box.summaries,
-    "player_statistics": box.player_statistics[alignment], 
+    "player_statistics": box.player_statistics[alignment],
     "pitching_records": relevant_pitching_records,
     "player_records": relevant_player_records,
     "manager": manager.__dict__
@@ -307,7 +308,7 @@ def get_mls_preview_data(team_id):
   context = {
     "next_game": next_game,
     "home_team": get(next_game['home_team']['api_uri']),
-    "away_team": get(next_game['away_team']['api_uri']),    
+    "away_team": get(next_game['away_team']['api_uri']),
     "home_previous_games": mls.get_previous_games(next_game['home_team']['api_uri']),
     "away_previous_games": mls.get_previous_games(next_game['away_team']['api_uri']),
     'event_details': get(next_game['resource_uri'])
@@ -342,7 +343,7 @@ def generate_mlb_preview():
 
   data = get_mls_preview_data(team_id)
 
-  html = render_template('mlb-preview.html', data=data, blurbs=blurbs, 
+  html = render_template('mlb-preview.html', data=data, blurbs=blurbs,
     gameNotes=get_list_from_params('gameNotes', blurbs),
     winningKeys=get_list_from_params('winIf', blurbs),
     losingKeys=get_list_from_params('loseIf', blurbs)
@@ -416,7 +417,7 @@ def get_publish_options_by_type(type):
 
 
 @app.route("/publish-options/<type>")
-def get_publish_options(type):  
+def get_publish_options(type):
   publish_options = get_publish_options_by_type(type)
   publish_options_cleaned = []
   for p in publish_options:
@@ -489,16 +490,16 @@ def generate_reaction():
   starter = mlb.get_starter(data['pitching_records'])
   bullpen =  mlb.get_bullpen(data['pitching_records'])
 
-  
+
   if 'battingSummaryBlurb' in blurbs:
       most_bases = mlb.get_player_with_most_bases(data['player_records'])
-      battingSummaryHtml = render_template('mlb-hitter-summary.html', data=data['player_records'], 
-        blurb=blurbs['battingSummaryBlurb'], gradeImage=grades['battingSummaryGrade'] if 'battingSummaryGrade' in grades else None, 
+      battingSummaryHtml = render_template('mlb-hitter-summary.html', data=data['player_records'],
+        blurb=blurbs['battingSummaryBlurb'], gradeImage=grades['battingSummaryGrade'] if 'battingSummaryGrade' in grades else None,
         personImage=most_bases['player']['headshots']['w192xh192'])
 
   if bullpen and 'bullpenSummaryBlurb' in blurbs:
-      bullpenSummaryHtml = render_template('mlb-pitching-summary.html', data=bullpen, 
-        blurb=blurbs['bullpenSummaryBlurb'], gradeImage=grades['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in grades else None, 
+      bullpenSummaryHtml = render_template('mlb-pitching-summary.html', data=bullpen,
+        blurb=blurbs['bullpenSummaryBlurb'], gradeImage=grades['bullpenSummaryGrade'] if 'bullpenSummaryGrade' in grades else None,
         personImage=bullpen[0]['player']['headshots']['w192xh192'])
 
   if ('blurb' in starter and starter['blurb'] != None):
@@ -514,11 +515,11 @@ def generate_reaction():
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       pitchers.append(evaluation)
 
-  hitters = []  
+  hitters = []
   for p in data['player_records']:
     stats = render_template('mlb-hitter-stats.html', data=p)
     if ('blurb' in p and p['blurb'] != None):
-      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if 'grade' in p else None, 
+      evaluation = render_template('evaluation.html', stats=stats, blurb=p['blurb'], gradeImage=p['grade'] if 'grade' in p else None,
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       hitters.append(evaluation)
 
@@ -535,8 +536,8 @@ def generate_reaction():
       freeForm.append(blurbs['freeForm' + str(x)])
 
   html = render_template('mlb-reaction.html', hitters=hitters, pitchers=pitchers, managerHtml=managerHtml,
-   battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml, 
-   freeForm=freeForm, overview=data["overview"], 
+   battingSummaryHtml=battingSummaryHtml, bullpenSummaryHtml=bullpenSummaryHtml, startingPitcherHtml=startingPitcherHtml,
+   freeForm=freeForm, overview=data["overview"],
    unevenInnings=len(data["overview"]['line_scores']['home']) != len(data["overview"]['line_scores']['away']))
 
   return jsonify({"html": html});
@@ -551,16 +552,18 @@ def generate_nba_reaction():
   evaluation = payload['evaluation']
   blurbs = evaluation['blurbs']
   grades = evaluation['grades']
-
-  data = get_aligned_nba_box_score(int(payload['team_id']))
+  data = get_aligned_nba_box_score(payload['team_id'])
   nba = NBA()
-  
+
   data['player_records'] = apply_evaluation(evaluation, data['player_records'])
-  players = []  
+  players = []
   for p in data['player_records']:
-    stats = render_template('nba-player-stats.html', p=p)
+    if 'player' in p:
+        stats = render_template('nba-player-stats.html', p=p['player'])
+    else:
+        stats = render_template('nba-player-stats.html', p=p)
     if ('blurb' in p and p['blurb'] != None):
-      evaluation = render_template('nba-evaluation.html', blurb=p['blurb'], stats=stats, gradeImage=p['grade'] if 'grade' in p else None, 
+      evaluation = render_template('nba-evaluation.html', blurb=p['blurb'], stats=stats, gradeImage=p['grade'] if 'grade' in p else None,
         personName=p['player']['first_initial_and_last_name'], personImage=p['player']['headshots']['w192xh192'])
       players.append(evaluation)
 
@@ -588,7 +591,7 @@ def generate_mls_reaction():
 
   data = get_aligned_mls_box_score(int(payload['team_id']))
   mls = MLS()
-  
+
   data['player_records'] = apply_evaluation(evaluation, data['player_records'])
   data['goalie_records'] = apply_evaluation(evaluation, data['goalie_records'])
   for d in data['goalie_records']:
@@ -611,4 +614,4 @@ def generate_mls_reaction():
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)    
+    app.run(host='0.0.0.0', port=port)

@@ -2,6 +2,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var AppConstants = require('../constants/AppConstants');
 var AppActions = require('../actions/AppActions');
 var jQuery = require('jquery/dist/jquery');
+const nbaBaseUrl = 'http://localhost:8000';
 
 var AppActionCreator = {
 
@@ -16,7 +17,7 @@ var AppActionCreator = {
      });
   },
   getNbaBox: function(teamId) {
-    jQuery.get( "/nba/box/" + teamId, function( data ) {
+    jQuery.get( nbaBaseUrl + "/nba/box/" + teamId, function( data ) {
         AppActions.setNbaBox(data);
      });
   },
@@ -31,8 +32,12 @@ var AppActionCreator = {
      });
   },
   getTeams: function(league) {
+      let baseUrlToUse = ""
+      if (league === 'nba') {
+          baseUrlToUse = nbaBaseUrl
+      }
       jQuery.ajax({
-          url: "/teams",
+          url: baseUrlToUse + "/teams",
           type: "POST",
           dataType: "json",
           data: {league: league},
