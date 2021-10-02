@@ -393,7 +393,7 @@ def read_file(file_name):
   return contents
 
 def get_config():
-  config_text = os.environ.get('config', read_file(os.path.join(APP_ROOT, 'config/config.json')))
+  config_text = os.environ.get('QUICK_REACTION_CONFIG', read_file(os.path.join(APP_ROOT, 'config/config.json')))
   return json.loads(config_text)
 
 def create_wordpress_draft(publish_target, title, html, tags):
