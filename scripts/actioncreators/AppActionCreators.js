@@ -2,7 +2,7 @@ var AppDispatcher = require('../dispatcher/AppDispatcher');
 var AppConstants = require('../constants/AppConstants');
 var AppActions = require('../actions/AppActions');
 var jQuery = require('jquery/dist/jquery');
-const nbaBaseUrl = 'http://espnapi.raptorsrepublic.com';
+const nbaBaseUrl = 'https://espnapi.raptorsrepublic.com';
 
 var AppActionCreator = {
 
