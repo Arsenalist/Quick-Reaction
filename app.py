@@ -108,7 +108,7 @@ class NBA(TheScore):
     return self.coach_mapping[team_id]
 
   def get_latest_box_score(self, team_id):
-    return requests.get('http://http://espnapi.raptorsrepublic.com/nba/box/' + team_id).json()
+    return requests.get('http://espnapi.raptorsrepublic.com/nba/box/' + team_id).json()
     # latest_game = self.find_latest_game('/nba/teams/' + str(team_id))
     # game = get(latest_game["api_uri"])
     # box_score_uri = game["box_score"]["api_uri"]
