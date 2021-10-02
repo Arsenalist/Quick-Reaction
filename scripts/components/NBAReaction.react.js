@@ -42,7 +42,7 @@ var NBAReaction = React.createClass({
   },
 
 
-  handleSelectTeam: function(e) {  
+  handleSelectTeam: function(e) {
     e.preventDefault();
     if (e.target.value == '') return false;
     this.state.thinkingTeamSelect = true;
@@ -54,7 +54,7 @@ var NBAReaction = React.createClass({
 
   handleGenerate: function(e) {
    //AppActions.setCreateDraftResult({}) // TODO: Fix this magic
-   AppActionCreator.getNbaReactionHtml(this.state.selectedTeam, this.state.evaluation);     
+   AppActionCreator.getNbaReactionHtml(this.state.selectedTeam, this.state.evaluation);
    this.state.thinkingGenerateReaction = true;
    this.setState(this.state);
    jQuery("body").scrollTop(0);
@@ -76,13 +76,13 @@ var NBAReaction = React.createClass({
   },
 
 
-  render: function() { 
+  render: function() {
     if (this.state.thinkingTeamSelect) {
       return (
           <div>Hold up, doing stuff...</div>
       );
-    } 
-    var generateButton = null, createDraftButton = null;  
+    }
+    var generateButton = null, createDraftButton = null;
     if (typeof this.state.player_records != 'undefined' && this.state.player_records.length != 0) {
       generateButton = <p><input type="button"  style={{margin: 10 + 'px'}}  onClick={this.handleGenerate} className="btn-lg btn-primary btn btn-block" value="Generate"/></p>;
     } else {
@@ -98,20 +98,20 @@ var NBAReaction = React.createClass({
     return (
       <div>
       <h1>NBA Reaction</h1>
-      <div className="row">      
-        <div className="col-xs-6">          
+      <div className="row">
+        <div className="col-xs-6">
             <TeamSelector league="nba" selectedTeam={this.state.selectedTeam} handleSelectTeam={this.handleSelectTeam}/>
             {generateButton}
-            <NBAReactionForm 
-                handleTextChange={this.handleTextChange} 
-                handleGradeChange={this.handleGradeChange} 
+            <NBAReactionForm
+                handleTextChange={this.handleTextChange}
+                handleGradeChange={this.handleGradeChange}
                 playerRecords={this.state.player_records}
                 manager={this.state.manager}/>
             {generateButton}
-                
+
         </div>
         <div className="col-xs-6">
-            {rightSide}            
+            {rightSide}
         </div>
       </div>
       </div>

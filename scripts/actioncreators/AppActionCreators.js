@@ -32,10 +32,12 @@ var AppActionCreator = {
      });
   },
   getTeams: function(league) {
-      let baseUrlToUse = ""
+      console.log("in getTeams", league)
+      var baseUrlToUse = ""
       if (league === 'nba') {
           baseUrlToUse = nbaBaseUrl
       }
+      console.log("baseURL is ", baseUrlToUse)
       jQuery.ajax({
           url: baseUrlToUse + "/teams",
           type: "POST",
