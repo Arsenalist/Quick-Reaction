@@ -377,7 +377,7 @@ def get_mls_box(id):
 
 @app.route("/nba/box/<id>")
 def get_nba_box(id):
-  context = get_aligned_nba_box_score(int(id))
+  context = get_aligned_nba_box_score(id)
   return jsonify(context)
 
 
