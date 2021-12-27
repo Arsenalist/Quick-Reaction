@@ -100,7 +100,7 @@ class NBA(TheScore):
   }
 
   def get_teams(self):
-    return get('/nba/teams/')
+    return requests.post('https://espnapi.raptorsrepublic.com/teams').json()
 
   def get_coach(self, team_id):
     if team_id not in self.coach_mapping:

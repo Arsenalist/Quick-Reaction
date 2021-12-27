@@ -20,5 +20,5 @@ var routes = (
 );
 
 ReactRouter.run(routes, ReactRouter.HashLocation, (Root) => {
-  React.render(<Root/>, document.getElementById('content'));
+    React.render(<Root/>, document.getElementById('content'));
 });
