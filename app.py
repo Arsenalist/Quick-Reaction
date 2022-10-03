@@ -100,7 +100,7 @@ class NBA(TheScore):
   }
 
   def get_teams(self):
-    return requests.post('https://espnapi.raptorsrepublic.com/teams').json()
+    return requests.post('https://nbaapi.raptorsrepublic.com/teams').json()
 
   def get_coach(self, team_id):
     if team_id not in self.coach_mapping:
@@ -108,7 +108,7 @@ class NBA(TheScore):
     return self.coach_mapping[team_id]
 
   def get_latest_box_score(self, team_id):
-    return requests.get('https://espnapi.raptorsrepublic.com/nba/box/' + str(team_id)).json()
+    return requests.get('https://nbaapi.raptorsrepublic.com/nba/box/' + str(team_id)).json()
     # latest_game = self.find_latest_game('/nba/teams/' + str(team_id))
     # game = get(latest_game["api_uri"])
     # box_score_uri = game["box_score"]["api_uri"]
